@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Academic Year Form</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">Academic Year</h1>
+			<th:block th:if="${currentAcademicYear != null}">
+				<span th:text="${currentAcademicYear.displayAcademicYear}"></span>
+			</th:block>
+		</div>
+		
+		
+
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
+            <div class="col">
+              <form action="#" th:action="@{/academicyears/save}" th:object="${academicYear}"  method="POST" class="needs-validation" autocomplete="off">
+               	<input type="hidden" th:field="*{id}" />
+               	<input type="hidden" th:field="*{year}" th:disabled="${!edit}"/>
+               	<input type="hidden" th:field="*{semester}" th:disabled="${!edit}"/>
+               	
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="year">School Year</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="year"
+                      th:field="*{year}"
+                      placeholder="ex: 2019-2020"
+                      value=""
+                      required
+                      th:disabled="${edit}"
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('year')}" th:errors="*{year}"></p>
+                  </div>
+                   <div class="col-md-4 mb-3">
+                    <label for="semester">Semester</label>
+					<select th:field="*{semester}" name="semester" class="form-control" required  th:disabled="${edit}">
+						<option  value="">Choose...</option>
+						<option  value="1st Sem">1st Sem</option>
+						<option  value="2nd Sem">2nd Sem</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('semester')}" th:errors="*{semester}"></p>
+                  </div>
+                  
+                  </div>
+                  <div class="row">
+                 <div class="col-md-4 mb-3">
+                  <label for="current">Set as Current School Year</label>
+                  <div class="form-control-plaintext" >
+                  	 <label for="current">Enable</label>
+                    <input
+                      type="radio"
+                      id="current"
+                      name="current"
+                      value="true"
+                      th:field="*{current}"
+                      checked
+                    />
+                    <label for="current2">Disable</label>
+                    <input
+                      type="radio"
+                      name="current2"
+                      id="current2"
+                      th:field="*{current}"
+                      value="false"
+                    />
+                    </div>
+                  </div>
+
+                </div>
+
+                <hr class="mb-4" />
+                <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  Save
+                </button>
+               
+				</form>
+				<br>
+				 <a th:href="@{/academicyears/list}" >Back to Academic Year List</a>
+			</div>
+	</div>
+	</div>
+</body>
+
+</html>

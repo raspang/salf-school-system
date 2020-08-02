@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Student Form</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+	 <h1 class="h2 pt-3 mb-3 pb-2 border-bottom">Employee</h1>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
+            <div class="col">
+              <form action="#" th:action="@{/employees/save}" th:object="${employee}"  method="POST" class="needs-validation" autocomplete="off">
+               	<input type="hidden" th:field="*{id}" />
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="firstName">Full Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="fullName"
+                      th:field="*{fullName}"
+                      placeholder=""
+                      value=""
+                      required
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></p>
+                  </div>
+                   <div class="col-md-6 mb-3">
+                    <label for="lastName">Title Position</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="positionTitle"
+                      th:field="*{positionTitle}"
+                      placeholder=""
+                      value=""
+                      required
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('positionTitle')}" th:errors="*{positionTitle}"></p>
+                  </div>
+                  
+                  <div class="col-md-4 mb-3">
+                    <label for="gender">Assigned Position Title</label>
+					<select  
+						class="custom-select d-block w-100"
+						id="positionId"
+						th:field="*{positionId}"
+						required>
+						<option value="">Choose...</option>
+						<option value="Registrar">Registrar</option>
+						<option value="Assessment Officer">Assessment Officer</option>
+					
+					</select>
+                  </div>	
+                
+                 <div class="col-md-4 mb-3">
+                  <label for="current">Select</label>
+                  <div class="form-control-plaintext" >
+                  	 <label for="selected">Enable</label>
+                    <input
+                      type="radio"
+                      id="selected"
+                      name="selected"
+                      value="true"
+                      th:field="*{selected}"
+                      checked
+                    />
+                    <label for="selected2">Disable</label>
+                    <input
+                      type="radio"
+                      name="selected2"
+                      id="selected2"
+                      th:field="*{selected}"
+                      value="false"
+                    />
+                    </div>
+                  </div>			
+		
+			    
+                  
+                </div>
+                <hr class="mb-4" />
+                <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  Save
+                </button>
+               
+				</form>
+				<br>
+				 <a th:href="@{/employees/list}" >Back to Employee List</a>
+			</div>
+	</div>
+	</div>
+</body>
+
+</html>

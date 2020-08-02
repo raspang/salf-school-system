@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Student Form</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+	 <h1 class="h2 pt-3 mb-3 pb-2 border-bottom">Certificate of Registration Form</h1>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
+            <div class="col">
+              <form action="#" th:action="@{/registrations/save}" th:object="${studentRegistration}"  method="POST" class="needs-validation" autocomplete="off">
+               	<input type="hidden" th:field="*{id}" />
+               	<input type="hidden" th:field="*{student}"  />
+               	<input type="hidden" th:field="*{course}" />
+               	<input type="hidden" th:field="*{academicYear}" />
+               	<input type="hidden" th:field="*{registrar}"/>
+               	<input type="hidden" th:field="*{assessmentOfficer}" />
+               	
+               	<div th:if="${registered}">
+               		<p style="color:red">Already registered!</p>
+               	</div>
+               	
+               <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label>Student</label>
+					 <input type="text" class="form-control text-secondary"  th:value="${studentStr}" disabled/>
+					
+				 </div>
+                  <div class="col-md-4 mb-3">
+                    <label>Course</label>
+		
+					 <input type="text" class="form-control text-secondary"  th:value="${courseStr}" disabled/>
+                  </div>                                 
+                   <div class="col-md-4 mb-3">
+                    <label>Current Academic Year</label>				
+					<input type="text" class="form-control text-secondary" th:value="${academicYearStr}" disabled/>
+				 </div>
+				 </div>
+		 		 
+				 <div class="row">
+                 <div class="col-md-4 mb-3">
+                    <label for="dateOfRegistration">Date Of Registration</label>
+                    <input
+                      type="date"
+                      class="form-control text-primary"
+                      id="dateOfRegistration"
+                      th:field="*{dateOfRegistration}"
+                      required
+                    />
+ 					<p style="color:red" th:if="${#fields.hasErrors('dateOfRegistration')}" th:errors="*{dateOfRegistration}"></p>
+                  </div>	            
+                  
+                   <div class="col-md-4 mb-3">
+                    <label for="curriculumYear">Student Year Level</label>
+					<select th:field="*{curriculumYear}"class="form-control text-primary">
+						<option value="">Choose..</option>
+						<option value="1st Year">1st Year</option>
+						<option value="2nd Year">2nd Year</option>
+						<option value="3rd Year">3rd Year</option>
+						<option value="4th Year">4th Year</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('curriculumYear')}" th:errors="*{curriculumYear}"></p>
+                  </div>
+    			 </div>
+    			 <div class="row">
+                    <div class="col-md-6 mb-3">
+                    <label for="title">Subject (press <code>ctrl</code> to click multiple subjects)</label>
+					<select class="form-control text-primary" th:field="*{subjects}" size="15" multiple="multiple">
+					    <option th:each="subject : ${subjects}"
+					            th:value="${{subject}}"
+					            th:text="${subject}">Course Title</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('subjects')}" th:errors="*{subjects}"></p>
+                  </div>
+                 </div>
+                  
+
+                <hr class="mb-4" />
+                <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  Save
+                </button>
+               
+				</form>
+				<br>
+				 <a th:href="@{/registrations/list}" >Back to Registered List</a>
+			</div>
+	</div>
+	</div>
+</body>
+
+</html>

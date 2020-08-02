@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Student Form</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+	 <h1 class="h2 pt-3 mb-3 pb-2 border-bottom">Course Form</h1>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
+            <div class="col">
+              <form action="#" th:action="@{/courses/save}" th:object="${course}"  method="POST" class="needs-validation" autocomplete="off">
+               	<input type="hidden" th:field="*{id}" />
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="title">Title</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="title"
+                      th:field="*{title}"
+                      placeholder=""
+                      value=""
+                      required
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+                  </div>
+                   <div class="col-md-4 mb-3">
+                    <label for="major">Major</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="major"
+                      th:field="*{major}"
+                      placeholder=""
+                      value=""
+                      
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('major')}" th:errors="*{major}"></p>
+                  </div>
+                 
+                  </div>
+
+                <hr class="mb-4" />
+                <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  Save
+                </button>
+               
+				</form>
+				<br>
+				 <a th:href="@{/courses/list}" >Back to Course List</a>
+			</div>
+	</div>
+	</div>
+</body>
+
+</html>

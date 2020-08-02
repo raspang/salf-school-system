@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Student Registration List</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">Student Registration</h1>
+			<th:block th:if="${currentAcademicYear != null}">
+				<span th:text="${currentAcademicYear.displayAcademicYear}"></span>
+			</th:block>
+		</div>
+		<form th:action="@{/registrations/list}" method="GET">
+		<div class="row">
+		  <div class="col-md-4 mb-3">
+		  		<label>Search</label>
+				<input type="search" class="form-control form-control-dark w-100 border"
+				placeholder="Seach first name or last name" 
+				name="keyword" id="keyword" size="50" th:value="${keyword}"/>
+			</div>
+			<div class="col-md-2 mb-3">
+				<label>Academic Year</label>
+				<select name="academicYear" id="academicYear" class="form-control  w-10 border">
+					<option value="">Choose..</option>
+					<option th:each="temp : ${academicYears}"
+					            th:value="${temp.id}"
+					            th:text="${temp.displayAcademicYear}">Academic Year</option>
+				</select>
+			</div>
+
+			<div class="col-md-2 mb-3">
+						
+				<div class="btn-group mr-2 mt-4">
+					<button type="submit" class="btn  btn-outline-secondary">
+						Search</button>
+				</div>
+			</div>
+		</div>
+		</form>
+	<!-- 	<a th:href="@{/registrations/showFormForAdd}"  class="btn btn-primary m-2">Add</a>
+	 -->
+		<div class="table-responsive">
+			<table class="table table-striped table-sm">
+				<thead>
+					<tr>
+						<th>First Name</th>
+						<th>Last Name</th>
+						<th>Gender</th>
+						<th>Course</th>
+						<th>Year</th>
+						<th>Major</th>
+						<th>SY</th>
+						<th>Semester</th>
+						<th>Date Of Registration</th>
+						<th>Subjects</th>
+						<th>Total Units</th>
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+        
+					<tr th:each="temp : ${studentRegistrations}">
+						
+						<td>
+							<span th:text="${temp.student.firstName}">First Name</span>
+						</td>
+						<td>
+							<span th:text="${temp.student.lastName}">Last Name</span>
+						</td>
+						<td>
+							<span th:text="${temp.student.sex}">Gender</span>
+						</td>
+						<td>
+							<span th:text="${temp.course.title}">Course</span></td>
+						<td><span th:text="${temp.curriculumYear}">Curriculum Year</span></td>
+						<td><span th:text="${temp.course.major}">Major</span></td>
+						<td><span th:text="${temp.academicYear.year}">SY</span></td>
+						<td><span th:text="${temp.academicYear.semester}">Semester</span></td>
+						<td><span th:text="${temp.dateOfRegistrationStr}">Date of Registration</span></td>					
+						<td>
+							<div class="list-group" th:each="subject : ${temp.subjects}">
+								<small   th:text="${subject.title}">subjects</small>
+							</div>
+				
+						</td>
+						<td class="text-center" ><span th:text="${temp.totalUnits}">Total Units</span></td>
+						<td>
+							<a th:href="@{/registrations/report/pdf/COR{id}-{lastname}(id=${temp.id},lastname=${temp.student.lastName})}"  target="_blank" class="btn btn-sm btn-outline-secondary">PDF</a>
+						</td>
+						<td>
+							<div th:if="${currentAcademicYear.id == temp.academicYear.id}" class="text-center btn-group-sm"
+								style="color: white; display: flex; justify-content: space-evenly;">
+								
+									<a th:href="@{/registrations/showFormForUpdate(studentRegistrationId=${temp.id})}" class="btn btn-sm btn-warning">Edit </a>
+									<div sec:authorize="hasRole('ROLE_ADMIN')">
+										<a th:href="@{/registrations/delete(studentRegistrationId=${temp.id})}" class="btn btn-sm btn-danger"
+										onclick="if (!(confirm('Are you sure you want to delete this registered?'))) return false"
+										>Delete </a>
+									</div>
+								
+
+							</div>
+							<div th:if="${currentAcademicYear.id != temp.academicYear.id}" class="text-center btn-group-sm">
+									<br>
+									<p class="text-muted" style="display: flex; justify-content: space-evenly;">View Only</p>
+							</div>
+								
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	
+		
+
+			<nav aria-label="Pagination" th:if="${studentRegistrations.totalPages gt 0}">
+		    <ul class="pagination justify-content-center font-weight-bold">
+		        <li class="page-item" th:classappend="${studentRegistrations.number eq 0} ? 'disabled'">
+		            <a class="page-link"
+		               th:href="@{/registrations/list?page={id}(id=${studentRegistrations.number lt 2 ? 1 : studentRegistrations.number},keyword=${keyword},academicYear=${academicYear})}"
+		               aria-label="Previous" title="Previous Page" data-toggle="tooltip">
+		                <span aria-hidden="true">&laquo;</span>
+		            </a>
+		        </li>
+		        <li class="page-item" th:classappend="${i eq studentRegistrations.number + 1} ? 'active'"
+		            th:each="i : ${#numbers.sequence( 1, studentRegistrations.totalPages, 1)}">
+		            <a class="page-link" th:href="@{/registrations/list?page={id}(id=${i},keyword=${keyword},academicYear=${academicYear})}" th:text="${i}"
+		               th:title="${'Page '+ i}" data-toggle="tooltip"></a>
+		        </li>
+		        <li class="page-item" th:classappend="${studentRegistrations.number + 1 eq studentRegistrations.totalPages} ? 'disabled'">
+		            <a class="page-link"
+		               th:href="@{/registrations/list?page={id}(id=${studentRegistrations.number + 2},keyword=${keyword},academicYear=${academicYear})}"
+		               aria-label="Next" title="Next Page" data-toggle="tooltip">
+		                <span aria-hidden="true">&raquo;</span>
+		            </a>
+		        </li>
+		    </ul>
+		 	</nav>
+		 	
+    
+    </div>
+
+
+
+</body>
+
+</html>

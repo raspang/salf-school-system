@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Student Form</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+	 <h1 class="h2 pt-3 mb-3 pb-2 border-bottom">Student Form</h1>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
+            <div class="col">
+              <form action="#" th:action="@{/students/save}" th:object="${student}"  method="POST" class="needs-validation" autocomplete="off">
+               	<input type="hidden" th:field="*{id}" />
+               	<input type="hidden" th:field="*{isRegistered}" />
+               	 <input type="hidden" th:field="*{deactivateDate}" /> 
+                <div class="row">
+                  <div class="col-md-4 mb-3">
+                    <label for="firstName">First name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="firstName"
+                      th:field="*{firstName}"
+                      placeholder=""
+                      value=""
+                      required
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></p>
+                  </div>
+                   <div class="col-md-4 mb-3">
+                    <label for="lastName">Middle name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="middleName"
+                      th:field="*{middleName}"
+                      placeholder=""
+                      value=""
+                      required
+                    />
+                  </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="lastName">Last name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="lastName"
+                      th:field="*{lastName}"
+                      placeholder=""
+                      value=""
+                      required
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
+                  </div>
+
+
+				
+	               <div class="col-md-4 mb-3">
+                    <label for="gender">Gender</label>
+					<select  
+						class="custom-select d-block w-100"
+						id="gender"
+						th:field="*{sex}"
+						required>
+						<option value="">Choose...</option>
+						<option value="Male">Male</option>
+						<option value="Female">Female</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
+                  </div>				
+		
+			       <div class="col-md-4 mb-3">
+                    <label for="dob">Date of Birth</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="dob"
+                      th:field="*{dob}"
+                      required
+                    />
+ 					<p style="color:red" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></p>
+                  </div>	
+                  
+                  <div class="col-md-4 mb-3">
+                    <label for="address">Address</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="address"
+                      th:field="*{address}"
+                      required
+                    />
+ 					<p style="color:red" th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></p>
+                  </div>	
+                   <div class="col-md-4 mb-3">
+                    <label for="title">Course</label>
+					<select class="form-control" th:field="*{course}">
+					    <option th:each="course : ${courses}"
+					            th:field="*{course}"
+					            th:value="${course.id}"
+					            th:text="${course.title}">Course Title</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('course')}" th:errors="*{course}"></p>
+                  </div>      
+               
+			       <div class="col-md-4 mb-3">
+                    <label for="dob">Date Admitted</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      id="dob"
+                      th:field="*{dateOfRegistration}"
+                      required
+                    />
+ 					<p style="color:red" th:if="${#fields.hasErrors('dateOfRegistration')}" th:errors="*{dateOfRegistration}"></p>
+                  </div>
+                  
+                  <div class="col-md-4 mb-3">
+                  <label for="current">Status</label>
+                  <div class="form-control-plaintext" >
+                  	 <label for="active">Active</label>
+                    <input
+                      type="radio"
+                      id="active"
+                      name="active"
+                      value="true"
+                      th:field="*{active}"
+                      checked
+                    />
+                    <label for="selected2">Deactivate</label>
+                    <input
+                      type="radio"
+                      name="deactivate"
+                      id="deactivate"
+                      th:field="*{active}"
+                      value="false"
+                    />
+                    </div>
+                  </div>
+                
+                  
+                </div>
+                <hr class="mb-4" />
+                <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  Save
+                </button>
+               
+				</form>
+				<br>
+				 <a th:href="@{/students/list}" >Back to Student List</a>
+			</div>
+	</div>
+	</div>
+</body>
+
+</html>

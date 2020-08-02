@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Subject Form</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+	 <h1 class="h2 pt-3 mb-3 pb-2 border-bottom">Subject Form</h1>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
+            <div class="col">
+              <form action="#" th:action="@{/subjects/save}" th:object="${subject}"  method="POST" class="needs-validation" autocomplete="off">
+               	<input type="hidden" th:field="*{id}" />
+                <div class="row">
+                  <div class="col-md-3 mb-3">
+                    <label for="title">Title</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="title"
+                      th:field="*{title}"
+                      placeholder="ex: Com 1"
+                      value=""
+                      required
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+                  </div>
+                   <div class="col-md-2 mb-3">
+                    <label for="units">Unit(s)</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="units"
+                      th:field="*{units}"
+                      placeholder="3"
+                      value=""
+                      
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('units')}" th:errors="*{units}"></p>
+                  </div>
+                     <div class="col-md-7 mb-3">
+                    <label for="descriptiveTitle">Descriptive Title</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="descriptiveTitle"
+                      th:field="*{descriptiveTitle}"
+                      placeholder=""
+                      value=""                      
+                    />
+                  </div>               
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                    <label for="title">Subject belongs to a Course(s)</label>
+					<select class="form-control text-primary" th:field="*{courses}" size="5" multiple="multiple">
+					    <option th:each="course : ${courses}"
+					            th:value="${{course}}"
+					            th:text="${course.title}">Course Title</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('courses')}" th:errors="*{courses}"></p>
+                  </div>
+                 </div>
+
+                <hr class="mb-4" />
+                <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  Save
+                </button>
+               
+				</form>
+				<br>
+				 <a th:href="@{/subjects/list}" >Back to Subject List</a>
+			</div>
+	</div>
+	</div>
+</body>
+
+</html>

@@ -10,7 +10,7 @@ import com.nzp.salf.entities.Subject;
 
 public interface SubjectRepository extends JpaRepository<Subject, Long>{
 
-	@Query("SELECT s FROM Subject s WHERE s.title LIKE %?1%")
+	@Query("SELECT s FROM Subject s WHERE s.title LIKE %?1% and s.enable = true")
 	Page<Subject> findAll(String keyword, Pageable pageable);
 
 }

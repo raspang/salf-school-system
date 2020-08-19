@@ -43,15 +43,17 @@ public class Subject {
              inverseJoinColumns = { @JoinColumn(name = "course_id") })
 	private List<Course> courses = new ArrayList<Course>();
 
+	private Boolean enable;
 
 	public Subject() {
-		
+		this.enable = true;
 	}
 
 	public Subject(String title, Integer units, String descriptiveTitle) {
 		this.title = title;
 		this.units = units;
 		this.descriptiveTitle = descriptiveTitle;
+		this.enable = true;
 	}
 
 	public Long getId() {
@@ -87,6 +89,14 @@ public class Subject {
 	}
 	
 	
+
+	public Boolean getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Boolean enable) {
+		this.enable = enable;
+	}
 
 	public List<Course> getCourses() {
 		return courses;

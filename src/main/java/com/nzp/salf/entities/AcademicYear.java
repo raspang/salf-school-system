@@ -10,17 +10,11 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name="academic_year",
-		uniqueConstraints={
-		           @UniqueConstraint(columnNames = "year"),
-	                @UniqueConstraint(columnNames = "semester")
-		}
-)
+@Table(name="academic_year")
 public class AcademicYear {
 
 	@Id
@@ -43,18 +37,23 @@ public class AcademicYear {
 	@OneToMany(mappedBy="academicYear")
 	List<StudentRegistration> studentRegistrations;
 	
+	private Boolean enable;
+	
+	
 	@Transient
 	private String displayAcademicYear;
 	
 	
 	public AcademicYear() {
 		this.current = true;
+		this.enable = true;
 	}
 
 	public AcademicYear(String year, String semester) {
 		this.year = year;
 		this.semester = semester;
 		this.current = true;
+		this.enable = true;
 	}
 
 	public Long getId() {
@@ -107,6 +106,14 @@ public class AcademicYear {
 	}
 
 	
+	public Boolean getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Boolean enable) {
+		this.enable = enable;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

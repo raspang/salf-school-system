@@ -89,7 +89,7 @@ public class RegistrationController {
 		theModel.addAttribute("studentRegistrations", studentRegistrationRepository.findAllOrderById(keyword, academicYear, PageRequest.of(page, size)));
 		theModel.addAttribute("keyword", keyword);
 		theModel.addAttribute("academicYear", academicYear);
-		theModel.addAttribute("academicYears", academicYearRepository.findAll());
+		theModel.addAttribute("academicYears", academicYearRepository.findByEnableOrderByIdDesc(true));
 		
 		return "registration/registrations";
 	}

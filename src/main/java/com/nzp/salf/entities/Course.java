@@ -22,21 +22,24 @@ public class Course {
 	
 	@NotNull(message="is required")
 	@Size(min=1, message="is required")
-	@Column(name = "title")
+	@Column(name = "title", unique = true)
 	private String title;
 	
 	private String major;
 
+	private Boolean enable;
+	
 	@OneToMany(mappedBy="course")
 	private List<StudentRegistration> studentRegistrations;
 	
 	public Course() {
-	
+		this.enable = true;
 	}
 
 	public Course(String title, String major) {		
 		this.title = title;
 		this.major = major;
+		this.enable = true;
 	}
 
 	public Long getId() {
@@ -69,6 +72,14 @@ public class Course {
 
 	public void setStudentRegistrations(List<StudentRegistration> studentRegistrations) {
 		this.studentRegistrations = studentRegistrations;
+	}
+
+	public Boolean getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Boolean enable) {
+		this.enable = enable;
 	}
 
 	@Override

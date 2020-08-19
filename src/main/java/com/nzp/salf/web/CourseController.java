@@ -65,16 +65,11 @@ public class CourseController{
 	
 	@GetMapping("/delete")
 	public String delete(@RequestParam("courseId") Long theId) {
-		courseRepository.deleteById(theId);
+		Optional<Course> temp = courseRepository.findById(theId);
+		Course theCourse = temp.orElse(null);
+		if(theCourse != null) theCourse.setEnable(false); 
+		courseRepository.save(theCourse);
 		return "redirect:/courses/list";
 	}
-	
-	/*
-	 * public String getPrincipal() { String username; Object principal =
-	 * SecurityContextHolder.getContext().getAuthentication().getPrincipal(); if
-	 * (principal instanceof UserDetails) { username =
-	 * ((UserDetails)principal).getUsername(); } else { username =
-	 * principal.toString(); } return username; }
-	 */
 
 }

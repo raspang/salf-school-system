@@ -27,6 +27,10 @@
                	<input type="hidden" th:field="*{year}" th:disabled="${!edit}"/>
                	<input type="hidden" th:field="*{semester}" th:disabled="${!edit}"/>
                	
+               	 <div th:if="${alreadyExist}">
+               		<p style="color:red">Already exist!</p>
+               	</div>
+               	
                 <div class="row">
                   <div class="col-md-4 mb-3">
                     <label for="year">School Year</label>

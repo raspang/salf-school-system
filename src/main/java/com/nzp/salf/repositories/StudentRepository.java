@@ -12,9 +12,9 @@ import com.nzp.salf.entities.Student;
 
 public interface StudentRepository extends JpaRepository<Student, Long>{
 	
-	@Query("SELECT s FROM Student s WHERE s.firstName LIKE %?1%"
+	@Query("SELECT s FROM Student s WHERE (s.firstName LIKE %?1%"
             + " OR s.lastName LIKE %?1%"
-            + " OR s.id LIKE %?1% order by s.id desc")
+            + " OR s.id LIKE %?1%) and s.enable = true order by s.id desc")
 	Page<Student> findAll(String keyword, Pageable pageable);
 	
 	List<Student> findByIsRegistered(Boolean isRegistered);

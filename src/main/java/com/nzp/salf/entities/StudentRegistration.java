@@ -38,7 +38,7 @@ public class StudentRegistration {
 	private Student student;
 	
 	@NotNull(message="is required")
-	@ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToOne(cascade = CascadeType.DETACH)
 	@JoinColumn(name="course_id")
 	private Course course;
 	
@@ -72,6 +72,8 @@ public class StudentRegistration {
              inverseJoinColumns = { @JoinColumn(name = "subject_id") })
 	private List<Subject> subjects = new ArrayList<Subject>();
 
+	private Boolean enable;
+	
 	@Transient
 	private String dateOfRegistrationStr;
 	
@@ -82,6 +84,7 @@ public class StudentRegistration {
 	
 	public StudentRegistration() {
 		this.dateOfRegistration= LocalDate.now();
+		this.enable = true;
 	}
 
 
@@ -91,6 +94,7 @@ public class StudentRegistration {
 		this.academicYear = academicYear;
 		this.curriculumYear = curriculumYear;
 		this.dateOfRegistration= LocalDate.now();
+		this.enable = true;
 	}
 
 
@@ -209,6 +213,16 @@ public class StudentRegistration {
 
 
 	
+
+	public Boolean getEnable() {
+		return enable;
+	}
+
+
+	public void setEnable(Boolean enable) {
+		this.enable = enable;
+	}
+
 
 	@Override
 	public String toString() {

@@ -43,14 +43,9 @@ public class StudentController{
 	
 	@GetMapping("/list")
 	public String showStudents(HttpServletRequest request, Model theModel) {
-		/*
-		 * List<Student> students =
-		 * studentRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-		 * theModel.addAttribute("students", students);
-		 */
-		
-		int page = 0; //default page number is 0 (yes it is weird)
-        int size = 10; //default page size is 10
+
+		int page = 0; 
+        int size = 10; 
         
         if (request.getParameter("page") != null && !request.getParameter("page").isEmpty()) {
             page = Integer.parseInt(request.getParameter("page")) - 1;
@@ -73,7 +68,7 @@ public class StudentController{
 	public String showFormForAdd(Model theModel) {
 		Student student = new Student();
 		theModel.addAttribute("student", student);
-		theModel.addAttribute("courses", courseRepository.findAll());
+		theModel.addAttribute("courses", courseRepository.findByEnableOrderByIdDesc(true));
 		return "student/student-form";
 	}
 	
@@ -105,7 +100,10 @@ public class StudentController{
 	
 	@GetMapping("/delete")
 	public String delete(@RequestParam("studentId") Long theId) {
-		studentRepository.deleteById(theId);
+		Optional<Student> temp = studentRepository.findById(theId);
+		Student theStudent = temp.orElse(null);
+		if(theStudent != null) theStudent.setEnable(false); 
+		studentRepository.save(theStudent);
 		return "redirect:/students/list";
 	}
 	

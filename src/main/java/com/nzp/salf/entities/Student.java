@@ -63,7 +63,7 @@ public class Student {
 	
 	
 	@NotNull(message="is required")
-	@OneToOne(cascade = {CascadeType.DETACH,CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REFRESH  })
+	@OneToOne(cascade=CascadeType.DETACH)
 	@JoinColumn(name="course_id")
 	private Course course;
 	
@@ -75,6 +75,8 @@ public class Student {
 	@DateTimeFormat (pattern="yyyy-MM-dd")
 	@Column(name="date_deactivate")
 	private LocalDate deactivateDate;
+	
+	private Boolean enable;
 	
 	@Transient
 	private String dobStr;
@@ -93,6 +95,7 @@ public class Student {
 		this.active = true;
 		this.dateOfRegistration = LocalDate.now();
 		this.isRegistered  = false;
+		this.enable = true;
 	}
 
 	public Long getId() {
@@ -237,6 +240,14 @@ public class Student {
 	}
 	
 	
+
+	public Boolean getEnable() {
+		return enable;
+	}
+
+	public void setEnable(Boolean enable) {
+		this.enable = enable;
+	}
 
 	@Override
 	public int hashCode() {

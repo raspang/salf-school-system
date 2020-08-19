@@ -35,7 +35,7 @@ public class AcademicYearController{
 	
 	@GetMapping("/list")
 	public String showCourses(Model theModel) {
-		List<AcademicYear> academicYears = academicYearRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+		List<AcademicYear> academicYears = academicYearRepository.findByEnableOrderByIdDesc(true);
 		theModel.addAttribute("academicYears", academicYears);
 		return "academicyear/academicyears";
 	}
@@ -58,10 +58,16 @@ public class AcademicYearController{
 	
 	@PostMapping("/save")
 	public String saveCourse(@Valid @ModelAttribute("academicYear") AcademicYear theAcademicYear,
-			BindingResult bindingResult) {
+			BindingResult bindingResult, Model theModel) {
 		
-		if(bindingResult.hasErrors())
+		if(bindingResult.hasErrors() || academicYearRepository.existsByYearAndSemester(theAcademicYear.getYear(), theAcademicYear.getSemester())) {
+			
+			theModel.addAttribute("edit", false);
+			if(academicYearRepository.existsByYearAndSemester(theAcademicYear.getYear(), theAcademicYear.getSemester()) )
+				theModel.addAttribute("alreadyExist", true);
+			else theModel.addAttribute("alreadyExist", false);
 			return "academicyear/academicyear-form";
+		}
 		
 		
 		if(theAcademicYear.getCurrent()) {
@@ -90,7 +96,10 @@ public class AcademicYearController{
 	
 	@GetMapping("/delete")
 	public String delete(@RequestParam("academicYearId") Long theId) {
-		academicYearRepository.deleteById(theId);
+		Optional<AcademicYear> ay = academicYearRepository.findById(theId);
+		AcademicYear theay = ay.orElse(null);
+		if(theay != null) theay.setEnable(false);
+		academicYearRepository.save(theay);
 		return "redirect:/academicyears/list";
 	}
 	

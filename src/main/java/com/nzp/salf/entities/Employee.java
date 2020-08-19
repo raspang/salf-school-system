@@ -33,8 +33,11 @@ public class Employee {
 	@Column(name="selected")
 	private Boolean selected;
 
+
+	
 	public Employee() {
 		selected = true;
+
 	}
 
 	public Employee(String fullName, String positionTitle, String positionId) {
@@ -42,6 +45,7 @@ public class Employee {
 		this.positionTitle = positionTitle;
 		this.positionId = positionId;
 		this.selected = true;
+
 	}
 
 	public Long getId() {
@@ -83,6 +87,7 @@ public class Employee {
 	public void setSelected(Boolean selected) {
 		this.selected = selected;
 	}
+
 
 	@Override
 	public String toString() {

@@ -61,7 +61,7 @@ public class SubjectController{
 	@GetMapping("/showFormForAdd")
 	public String showFormForAdd(Model theModel) {
 		Subject subject = new Subject();
-		theModel.addAttribute("courses", courseRepository.findAll());
+		theModel.addAttribute("courses", courseRepository.findByEnableOrderByIdDesc(true));
 		theModel.addAttribute("subject", subject);
 		return "subject/subject-form";
 	}
@@ -88,16 +88,15 @@ public class SubjectController{
 	
 	@GetMapping("/delete")
 	public String delete(@RequestParam("subjectId") Long theId) {
-		subjectRepository.deleteById(theId);
+		
+		Optional<Subject> temp = subjectRepository.findById(theId);
+		Subject theSubject = temp.orElse(null);
+		if(theSubject != null) theSubject.setEnable(false); 
+		subjectRepository.save(theSubject);
+		
 		return "redirect:/subjects/list";
 	}
 	
-	/*
-	 * public String getPrincipal() { String username; Object principal =
-	 * SecurityContextHolder.getContext().getAuthentication().getPrincipal(); if
-	 * (principal instanceof UserDetails) { username =
-	 * ((UserDetails)principal).getUsername(); } else { username =
-	 * principal.toString(); } return username; }
-	 */
+
 
 }

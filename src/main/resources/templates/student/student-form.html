@@ -17,6 +17,7 @@
                	<input type="hidden" th:field="*{id}" />
                	<input type="hidden" th:field="*{isRegistered}" />
                	 <input type="hidden" th:field="*{deactivateDate}" /> 
+
                 <div class="row">
                   <div class="col-md-4 mb-3">
                     <label for="firstName">First name</label>
@@ -57,7 +58,20 @@
 					<p style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></p>
                   </div>
 
-
+               	   <div class="col-md-4 mb-3">
+                    <label for="studentId">Student ID</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="studentId"
+                      th:field="*{studentId}"
+                      placeholder="ex: 2019-C0001"
+                      value=""
+                      required
+                    />
+					<p style="color:red" th:if="${#fields.hasErrors('studentId')}" th:errors="*{studentId}"></p>
+                  </div>
+                  
 				
 	               <div class="col-md-4 mb-3">
                     <label for="gender">Gender</label>

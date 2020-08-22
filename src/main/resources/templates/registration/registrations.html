@@ -17,6 +17,11 @@
 				<span th:text="${currentAcademicYear.displayAcademicYear}"></span>
 			</th:block>
 		</div>
+		
+		<div class="alert alert-success" role="alert" th:if="${param.success != null}">
+		 	Student Registration has been successfully <span th:text="${param.success}"></span>.
+		</div>
+		
 		<form th:action="@{/registrations/list}" method="GET">
 		<div class="row">
 		  <div class="col-md-4 mb-3">
@@ -120,30 +125,37 @@
 		</div>
 	
 		
-
-			<nav aria-label="Pagination" th:if="${studentRegistrations.totalPages gt 0}">
-		    <ul class="pagination justify-content-center font-weight-bold">
-		        <li class="page-item" th:classappend="${studentRegistrations.number eq 0} ? 'disabled'">
-		            <a class="page-link"
-		               th:href="@{/registrations/list?page={id}(id=${studentRegistrations.number lt 2 ? 1 : studentRegistrations.number},keyword=${keyword},academicYear=${academicYear})}"
-		               aria-label="Previous" title="Previous Page" data-toggle="tooltip">
-		                <span aria-hidden="true">&laquo;</span>
-		            </a>
-		        </li>
-		        <li class="page-item" th:classappend="${i eq studentRegistrations.number + 1} ? 'active'"
-		            th:each="i : ${#numbers.sequence( 1, studentRegistrations.totalPages, 1)}">
-		            <a class="page-link" th:href="@{/registrations/list?page={id}(id=${i},keyword=${keyword},academicYear=${academicYear})}" th:text="${i}"
-		               th:title="${'Page '+ i}" data-toggle="tooltip"></a>
-		        </li>
-		        <li class="page-item" th:classappend="${studentRegistrations.number + 1 eq studentRegistrations.totalPages} ? 'disabled'">
-		            <a class="page-link"
-		               th:href="@{/registrations/list?page={id}(id=${studentRegistrations.number + 2},keyword=${keyword},academicYear=${academicYear})}"
-		               aria-label="Next" title="Next Page" data-toggle="tooltip">
-		                <span aria-hidden="true">&raquo;</span>
-		            </a>
-		        </li>
-		    </ul>
-		 	</nav>
+		 	
+		 	<nav aria-label="Pagination" th:if="${studentRegistrations.totalPages gt 0}">
+			    <ul class="pagination justify-content-center font-weight-medium">
+			        <li class="page-item" th:classappend="${studentRegistrations.number eq 0} ? 'disabled'">
+			            <a class="page-link svg-icon"
+			               th:href="@{/registrations/list?page={id}(id=${studentRegistrations.number lt 2 ? 1 : studentRegistrations.number},keyword=${keyword},academicYear=${academicYear})}"
+			               aria-label="Previous"
+			               title="Previous Page" rel="tooltip">
+			                <span aria-hidden="true" data-feather="chevrons-left" width="20" height="20"></span>
+			            </a>
+			        </li>
+			        <li class="page-item" th:classappend="${i eq studentRegistrations.number + 1} ? 'active'"
+			            th:each="i : ${#numbers.sequence( studentRegistrations.number + 1, studentRegistrations.totalPages > 10 + studentRegistrations.number ? studentRegistrations.number + 10 : studentRegistrations.totalPages, 1)}">
+			            <a class="page-link" th:href="@{/registrations/list?page={id}(id=${i},keyword=${keyword},academicYear=${academicYear})}" th:text="${i}"
+			               th:title="${'Page '+ i}"
+			               rel="tooltip"></a>
+			        </li>
+			        <li class="page-item disabled" th:if="${studentRegistrations.number + 10 < studentRegistrations.totalPages}">
+			            <a class="page-link svg-icon" href="#">
+			                <span data-feather="more-horizontal" width="20" height="20"></span>
+			            </a>
+			        </li>
+			        <li class="page-item" th:classappend="${studentRegistrations.number + 1 eq studentRegistrations.totalPages} ? 'disabled'">
+			            <a class="page-link svg-icon" th:href="@{/registrations/list?page={id}(id=${studentRegistrations.number + 2},keyword=${keyword},academicYear=${academicYear})}"
+			               aria-label="Next"
+			               title="Next Page" rel="tooltip">
+			                <span aria-hidden="true" data-feather="chevrons-right" width="20" height="20"></span>
+			            </a>
+			        </li>
+			    </ul>
+			</nav>
 		 	
     
     </div>

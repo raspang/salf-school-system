@@ -31,12 +31,7 @@ public class SubjectController{
 	@Autowired
 	private CourseRepository courseRepository;
 	
-	/*
-	 * @GetMapping("/list") public String showSubjects(Model theModel) {
-	 * List<Subject> subjects =
-	 * subjectRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-	 * theModel.addAttribute("subjects", subjects); return "subject/subjects"; }
-	 */
+
 	
 	@GetMapping("/list")
 	public String showSubjectsPageByPage(HttpServletRequest request, Model theModel) {
@@ -79,11 +74,21 @@ public class SubjectController{
 			BindingResult bindingResult, Model theModel) {
 		
 		if(bindingResult.hasErrors()) {
-			theModel.addAttribute("courses", courseRepository.findAll());
+			if(theSubject.getId() != null)
+				theModel.addAttribute("courses", courseRepository.findAll());
+			else
+				theModel.addAttribute("courses", courseRepository.findByEnableOrderByIdDesc(true));
 			return "subject/subject-form";	
 		}
+		
+		String success = "created";
+		if(theSubject.getId() != null) {
+			success = "updated";
+		}
+		
+		
 		subjectRepository.save(theSubject);
-		return "redirect:/subjects/list";
+		return "redirect:/subjects/list?success="+success;
 	}
 	
 	@GetMapping("/delete")

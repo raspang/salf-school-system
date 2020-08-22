@@ -25,6 +25,7 @@ import com.nzp.salf.entities.Course;
 import com.nzp.salf.entities.Employee;
 import com.nzp.salf.entities.Student;
 import com.nzp.salf.entities.StudentRegistration;
+import com.nzp.salf.exception.ResourceNotFoundException;
 import com.nzp.salf.repositories.AcademicYearRepository;
 import com.nzp.salf.repositories.EmployeeRepository;
 import com.nzp.salf.repositories.StudentRegistrationRepository;
@@ -63,18 +64,12 @@ public class RegistrationController {
 
     @Autowired
     private RegistrationService registrationService;
-	/*
-	 * @GetMapping("/list") public String showStudentRegistrations(Model theModel) {
-	 * List<StudentRegistration> studentRegistrations =
-	 * studentRegistrationRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
-	 * theModel.addAttribute("studentRegistrations", studentRegistrations); return
-	 * "registration/registrations"; }
-	 */
+
 	
 	@GetMapping("/list")
 	public String showStudentRegistrations(HttpServletRequest request, Model theModel) {
 		int page = 0; //default page number is 0 (yes it is weird)
-        int size = 10; //default page size is 1
+        int size = 15; //default page size is 1
         
         if (request.getParameter("page") != null && !request.getParameter("page").isEmpty()) {
             page = Integer.parseInt(request.getParameter("page")) - 1;
@@ -99,13 +94,10 @@ public class RegistrationController {
 	public String showFormForAdd(@RequestParam(name="studentId", required=true) Long theId, Model theModel) {
 		StudentRegistration studentRegistration = new StudentRegistration();
 		
-		Employee registrar = employeeRepository.findByPositionIdAndSelected("Registrar", true);
-		Employee assessmentOfficer = employeeRepository.findByPositionIdAndSelected("Assessment Officer", true);
-		Optional<Student> student = studentRepository.findById(theId);
-		Student theStudent = student.orElse(null);
-		Course theCourse = null;
-		if(theStudent != null)
-			theCourse = theStudent.getCourse();
+		Employee registrar = employeeRepository.findFirstByPositionIdAndSelected("Registrar", true);
+		Employee assessmentOfficer = employeeRepository.findFirstByPositionIdAndSelected("Assessment Officer", true);
+		Student theStudent = studentRepository.findById(theId).orElseThrow( () -> new ResourceNotFoundException("Student", "id", theId));
+		Course theCourse = theStudent.getCourse();
 		
 		studentRegistration.setRegistrar(registrar);
 		studentRegistration.setAssessmentOfficer(assessmentOfficer);
@@ -146,6 +138,12 @@ public class RegistrationController {
 	public String saveRegistered(@Valid @ModelAttribute("studentRegistration") StudentRegistration theStudentRegistration,
 			BindingResult bindingResult, Model theModel) {
 		
+		String success = "created";
+		if(theStudentRegistration.getId() != null) {
+			success = "updated";
+		}
+
+		
 		boolean isRegistered = false;
 		if(theStudentRegistration.getId() == null )
 			isRegistered = registrationService.findExist(theStudentRegistration.getStudent(), getCurrentAcademicYear());
@@ -165,9 +163,11 @@ public class RegistrationController {
 		/* Update the status of student registered */
 		Student theStudent = theStudentRegistration.getStudent();
 		theStudent.setIsRegistered(true);
+		
+		
 		studentRepository.save(theStudent);
 		
-		return "redirect:/registrations/list";
+		return "redirect:/registrations/list?success="+success;
 	}
 	
 	@GetMapping("/delete")

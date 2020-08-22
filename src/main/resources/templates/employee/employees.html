@@ -13,9 +13,13 @@
 		<div
 			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 			<h1 class="h2">Employees</h1>
-			<p><span th:text="${currentAcademicYear}">currentAcademicYear</span></p>
 		</div>
 
+		<div class="alert alert-success" role="alert" th:if="${param.success != null}">
+		 	Employee has been successfully <span th:text="${param.success}"></span>.
+		</div>
+		
+		
 		<a th:href="@{/employees/showFormForAdd}"  class="btn btn-primary m-2">Add</a>
 	
 		<div class="table-responsive">

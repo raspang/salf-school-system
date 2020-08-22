@@ -67,8 +67,15 @@ public class UserController{
 			return "user/user-form";	
 		
 		theUser.setPassword(passwordEncoder.encode(theUser.getPassword()));
+		
+		String success = "created";
+		if(theUser.getId() != null) {
+			success = "updated";
+		}
+		
 		userRepository.save(theUser);
-		return "redirect:/users/list";
+		
+		return "redirect:/users/list?success="+success;
 	}
 	
 	@GetMapping("/delete")

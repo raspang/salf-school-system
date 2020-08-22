@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -29,6 +30,10 @@ public class Student {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotEmpty(message="is required")
+	@Column(name="student_id", unique = true)
+	private String studentId;
+
 	@NotNull(message="is required")
 	@Size(min=3, message="is required")
 	@Column(name="first_name")
@@ -47,13 +52,11 @@ public class Student {
 	@Column(name="address")
 	private String address;
 	
-
 	@DateTimeFormat (pattern="yyyy-MM-dd")
 	private LocalDate dob;
 	
 	@NotNull(message="is required")
 	private String sex;
-	
 	
 	@DateTimeFormat (pattern="yyyy-MM-dd")
 	private LocalDate dateOfRegistration;
@@ -97,6 +100,17 @@ public class Student {
 		this.isRegistered  = false;
 		this.enable = true;
 	}
+
+	
+	public String getStudentId() {
+		return studentId;
+	}
+
+
+	public void setStudentId(String studentId) {
+		this.studentId = studentId;
+	}
+
 
 	public Long getId() {
 		return id;

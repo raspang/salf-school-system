@@ -58,9 +58,14 @@ public class CourseController{
 		
 		if(bindingResult.hasErrors())
 			return "course/course-form";	
+
+		String success = "created";
+		if(theCourse.getId() != null) {
+			success = "updated";
+		}
 		
 		courseRepository.save(theCourse);
-		return "redirect:/courses/list";
+		return "redirect:/courses/list?success="+success;
 	}
 	
 	@GetMapping("/delete")

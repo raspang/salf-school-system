@@ -118,7 +118,14 @@
 			<script th:src="@{'/assets/js/feather.min.js'}"></script>
 			<script th:src="@{'/assets/js/Chart.min.js'}"></script>
 			<script th:src="@{'/assets/js/dashboard.js'}"></script>
-
+				<script>
+				$(document).ready(function() {
+				    // show the alert
+				    setTimeout(function() {
+				        $(".alert").alert('close');
+				    }, 2000);
+				});
+				</script>
 			
 </body>
 </html>

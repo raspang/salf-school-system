@@ -12,12 +12,14 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nzp.salf.entities.AcademicYear;
 import com.nzp.salf.entities.Student;
+import com.nzp.salf.exception.ResourceNotFoundException;
 import com.nzp.salf.repositories.AcademicYearRepository;
 import com.nzp.salf.repositories.StudentRepository;
 
@@ -48,24 +50,31 @@ public class AcademicYearController{
 		return "academicyear/academicyear-form";
 	}
 	
-	@GetMapping("/showFormForUpdate")
-	public String showFormForUpdate(@RequestParam("academicYearId") Long theId, Model theModel) {
-		Optional<AcademicYear> academicYear = academicYearRepository.findById(theId);
-		theModel.addAttribute("academicYear", academicYear);
-		theModel.addAttribute("edit", true);
-		return "academicyear/academicyear-form";	
-	}
+	/*
+	 * @GetMapping("/showFormForUpdate") public String
+	 * showFormForUpdate(@RequestParam("academicYearId") Long theId, Model theModel)
+	 * { Optional<AcademicYear> academicYear =
+	 * academicYearRepository.findById(theId); theModel.addAttribute("academicYear",
+	 * academicYear); theModel.addAttribute("edit", true); return
+	 * "academicyear/academicyear-form"; }
+	 */
 	
+
 	@PostMapping("/save")
 	public String saveCourse(@Valid @ModelAttribute("academicYear") AcademicYear theAcademicYear,
 			BindingResult bindingResult, Model theModel) {
 		
+
+		
 		if(bindingResult.hasErrors() || academicYearRepository.existsByYearAndSemester(theAcademicYear.getYear(), theAcademicYear.getSemester())) {
 			
 			theModel.addAttribute("edit", false);
+			
 			if(academicYearRepository.existsByYearAndSemester(theAcademicYear.getYear(), theAcademicYear.getSemester()) )
 				theModel.addAttribute("alreadyExist", true);
-			else theModel.addAttribute("alreadyExist", false);
+			else 
+				theModel.addAttribute("alreadyExist", false);
+			
 			return "academicyear/academicyear-form";
 		}
 		
@@ -79,6 +88,13 @@ public class AcademicYearController{
 			}
 				
 		}
+
+		String success = "created";
+		if(theAcademicYear.getId() != null) {
+			success = "updated";
+		}
+		
+			
 		academicYearRepository.save(theAcademicYear);
 		
 		/* Update all students to not registered */
@@ -87,12 +103,53 @@ public class AcademicYearController{
 			for(Student student: students) {
 				student.setIsRegistered(false);
 				studentRepository.save(student);
+			}		
+		}
+		
+		return "redirect:/academicyears/list?success="+success;
+	}
+	
+	@GetMapping("/select/{academicYearId}")
+	public String selectAY(@PathVariable Long academicYearId, Model theModel) {
+		
+		AcademicYear theAcademicYear = academicYearRepository.findById(academicYearId).orElseThrow(
+				() -> new ResourceNotFoundException("AcademicYear", "id", academicYearId));
+		
+		if(!theAcademicYear.getCurrent()) {
+			// turn off the current
+			for(AcademicYear academicYear: academicYearRepository.findAll()) {
+				if(academicYear.getCurrent()) {
+					academicYear.setCurrent(false);
+					academicYearRepository.save(academicYear);
+				}
 			}
 				
-			
 		}
-		return "redirect:/academicyears/list";
+		theAcademicYear.setCurrent(true);
+		
+		String success = "created";
+		if(theAcademicYear.getId() != null) {
+			success = "updated";
+		}
+
+		academicYearRepository.save(theAcademicYear);
+		
+	
+		
+		
+		/* Change the setting for students list: registration are now open*/
+
+		List<Student> students = studentRepository.findByIsRegistered(true);
+		for(Student student: students) {
+			student.setIsRegistered(false);
+			studentRepository.save(student);
+		}		
+
+		
+		
+		return "redirect:/academicyears/list?success="+success;
 	}
+	
 	
 	@GetMapping("/delete")
 	public String delete(@RequestParam("academicYearId") Long theId) {

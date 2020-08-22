@@ -45,7 +45,7 @@ public class StudentController{
 	public String showStudents(HttpServletRequest request, Model theModel) {
 
 		int page = 0; 
-        int size = 10; 
+        int size = 15; 
         
         if (request.getParameter("page") != null && !request.getParameter("page").isEmpty()) {
             page = Integer.parseInt(request.getParameter("page")) - 1;
@@ -84,6 +84,12 @@ public class StudentController{
 	public String saveStudent(@Valid @ModelAttribute("student") Student theStudent,
 			BindingResult bindingResult, Model theModel) {
 		
+		String success = "created";
+		if(theStudent.getId() != null) {
+			success = "updated";
+		}
+		
+		
 		if(bindingResult.hasErrors()) {
 			theModel.addAttribute("courses", courseRepository.findAll());
 			return "student/student-form";
@@ -95,7 +101,7 @@ public class StudentController{
 			theStudent.setDeactivateDate(null);
 		
 		studentRepository.save(theStudent);
-		return "redirect:/students/list";
+		return "redirect:/students/list?success="+success;
 	}
 	
 	@GetMapping("/delete")

@@ -55,9 +55,14 @@ public class EmployeeController{
 		
 		if(bindingResult.hasErrors())
 			return "employee/employee-form";
+
+		String success = "created";
+		if(theEmployee.getId() != null) {
+			success = "updated";
+		}
 		
 		employeeRepository.save(theEmployee);
-		return "redirect:/employees/list";
+		return "redirect:/employees/list?success="+success;
 	}
 	
 	@GetMapping("/delete")

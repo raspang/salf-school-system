@@ -16,6 +16,10 @@
 
 		</div>
 
+		<div class="alert alert-success" role="alert" th:if="${param.success != null}">
+		 	Academic Year has been successfully <span th:text="${param.success}"></span>.
+		</div>
+
 		<a th:href="@{/academicyears/showFormForAdd}"  class="btn btn-primary m-2">Add</a>
 	
 		<div class="table-responsive">
@@ -34,18 +38,29 @@
 					<tr th:each="temp : ${academicYears}">					
 						<td><span th:text="${temp.year}">School Year</span></td>
 						<td><span th:text="${temp.semester}">Semester</span></td>
-						<td>
-							<th:block th:if="${temp.current}">
-									<span class="badge badge-info">Current Academic Year</span>
-							</th:block>
+						<td class="text-center">
+
+							
+							<div class="btn-group-toggle" data-toggle="buttons" th:if="${temp.current}">
+							  <label class="btn btn-sm btn-secondary active text-muted">
+							    <input type="checkbox"  checked autocomplete="off" > Selected
+							  </label>
+							</div>
+
+							<div class="btn-group-toggle" data-toggle="buttons" th:if="${!temp.current}">
+							  <label class="btn btn-sm btn-secondary active">
+							    <a  class="text-white" th:href="@{/academicyears/select/{academicYearId}(academicYearId=${temp.id})}" > Select</a>
+							  </label>
+							</div>
+							
 						</td>
 						<td>
 							<div class="text-center btn-group-sm"
 								style="color: white; display: flex; justify-content: space-evenly;">
-								<a th:href="@{/academicyears/showFormForUpdate(academicYearId=${temp.id})}" class="btn-sm btn-warning">Edit </a> 
-								
+			
 								<div sec:authorize="hasRole('ROLE_ADMIN')">
-									<a th:href="@{/academicyears/delete(academicYearId=${temp.id})}" class="btn-sm btn-danger">Delete </a>
+									<a th:href="@{/academicyears/delete(academicYearId=${temp.id})}" class="btn-sm btn-danger"
+									onclick="if (!(confirm('Are you sure you want to delete this Academic Year?'))) return false">Delete </a>
 								</div>
 							</div>
 						</td>
@@ -56,6 +71,7 @@
 
 
 	</div>
+
 </body>
 
 </html>

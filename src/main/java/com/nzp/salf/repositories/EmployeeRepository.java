@@ -7,7 +7,7 @@ import com.nzp.salf.entities.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long>{
 
-	public Employee findByPositionIdAndSelected(String positionId, Boolean selected);
+	public Employee findFirstByPositionIdAndSelected(String positionId, Boolean selected);
 	
 }
 	

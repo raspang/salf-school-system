@@ -18,5 +18,7 @@ public interface StudentRepository extends JpaRepository<Student, Long>{
 	Page<Student> findAll(String keyword, Pageable pageable);
 	
 	List<Student> findByIsRegistered(Boolean isRegistered);
+	
+	Boolean existsByStudentId(String studentId);
 }
 	

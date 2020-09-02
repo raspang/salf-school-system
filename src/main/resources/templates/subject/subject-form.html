@@ -55,14 +55,34 @@
                   </div>               
                   </div>
                   <div class="row">
-                    <div class="col-md-6 mb-3">
-                    <label for="title">Subject belongs to a Course(s)</label>
-					<select class="form-control text-primary" th:field="*{courses}" size="5" multiple="multiple">
+                    <div class="col-md-5 mb-3">
+                    <label for="course">Subject belongs to a Course(s)</label>
+					<select id="course" class="form-control text-primary" th:field="*{courses}" size="5" multiple="multiple">
 					    <option th:each="course : ${courses}"
 					            th:value="${{course}}"
 					            th:text="${course.title}">Course Title</option>
 					</select>
 					<p style="color:red" th:if="${#fields.hasErrors('courses')}" th:errors="*{courses}"></p>
+                  </div>
+                   <div class="col-md-3 mb-3">
+                    <label for="yearLevel">Year Level (Optional)</label>
+					<select class="form-control text-primary" th:field="*{curriculumYear}" >
+						<option value="">Choose...</option>
+						<option value="1st Year">1st Year</option>
+						<option value="2nd Year">2nd Year</option>
+						<option value="3rd Year">3rd Year</option>
+						<option value="4th Year">4th Year</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('curriculumYear')}" th:errors="*{curriculumYear}"></p>
+                  </div>
+                  <div class="col-md-3 mb-3">
+                    <label for="semester">Semester (Optional)</label>
+					<select class="form-control text-primary" th:field="*{semester}" >
+						<option  value="">Choose...</option>
+						<option  value="1st Sem">1st Sem</option>
+						<option  value="2nd Sem">2nd Sem</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('semester')}" th:errors="*{semester}"></p>
                   </div>
                  </div>
 

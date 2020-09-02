@@ -78,11 +78,11 @@
 									<th:block th:if="${temp.active}">
 										<th:block th:if="${!temp.isRegistered}">
 											<a
-												th:href="@{/registrations/showFormForAdd(studentId=${temp.id})}"
-												class="btn-sm btn-primary">Add Registered </a>
+												th:href="@{/registrations/{action}(id=${temp.id},action='showFormForAdd')}"
+												class="btn btn-sm btn-primary">Add Registered </a>
 										</th:block>
 										<th:block th:if="${temp.isRegistered}">
-											<small class="btn-sm  text-secondary"><span>Registered</span></small>
+											<small class="btn btn-sm  text-secondary"><span>Registered</span></small>
 										</th:block>
 									</th:block>
 								</th:block>
@@ -96,11 +96,11 @@
 							<div class="text-center btn-group-sm"
 								style="color: white; display: flex; justify-content: space-evenly;">
 								<a th:href="@{/students/showFormForUpdate(studentId=${temp.id})}"
-									class="btn-sm btn-warning">Edit </a>
+									class="btn btn-sm btn-warning">Edit </a>
 									
 								<div style="color: white; display: flex; justify-content: space-evenly;" sec:authorize="hasRole('ROLE_ADMIN')">
 									<a th:href="@{/students/delete(studentId=${temp.id})}"
-									class="btn-sm btn-danger"
+									class="btn btn-sm btn-danger"
 									onclick="if (!(confirm('Are you sure you want to delete this student?'))) return false">Delete
 								</a>
 								</div>

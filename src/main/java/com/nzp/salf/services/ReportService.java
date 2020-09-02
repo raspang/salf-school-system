@@ -15,9 +15,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
+import com.nzp.salf.entities.Report;
 import com.nzp.salf.entities.StudentRegistration;
 import com.nzp.salf.entities.Subject;
+import com.nzp.salf.repositories.AcademicYearRepository;
 import com.nzp.salf.repositories.StudentRegistrationRepository;
+
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperReport;
@@ -29,6 +32,9 @@ public class ReportService {
 	
 	@Autowired
 	private StudentRegistrationRepository studentRegistrationRepository;
+	
+	@Autowired
+	private AcademicYearRepository academicYearRepository;
 	
 	public String exportReport(HttpServletResponse resp, Long id) throws JRException, IOException {
 		
@@ -79,4 +85,50 @@ public class ReportService {
         return "report generated";
 		
 	}
+	
+
+	public String exportReports(HttpServletResponse resp, List<StudentRegistration> studentRegistrations, String academicYear) throws JRException, IOException {
+
+		List<Report> reports = new ArrayList<>();
+		for(StudentRegistration sR: studentRegistrations) {
+			Report report = new Report();
+			report.setStudentId(sR.getStudent().getStudentId());
+			report.setLastName(sR.getStudent().getLastName());
+			report.setFirstName(sR.getStudent().getFirstName());
+			report.setGender(sR.getStudent().getSex());
+			report.setCourse(sR.getCourse().getTitle());
+			report.setMajor(sR.getCourse().getMajor());
+			report.setYear(sR.getCurriculumYear());
+			report.setSy(sR.getAcademicYear().getYear());
+			report.setSemester(sR.getAcademicYear().getSemester());
+			report.setDateOfRegistration(sR.getDateOfRegistrationStr());
+			report.setSubjects(sR.getSubjects().toString());
+			report.setUnits(String.valueOf(sR.getTotalUnits()));
+			reports.add(report);
+		}
+		
+		
+		byte[] bytes = null;
+        File file = ResourceUtils.getFile("classpath:report_landscape.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reports);
+        Map<String, Object> parameters = new HashMap<>();
+        
+           parameters.put("academicYear", academicYear);
+        
+        	bytes = JasperRunManager.runReportToPdf(jasperReport, parameters, dataSource);
+        	
+    		resp.reset();
+    		resp.resetBuffer();
+    		resp.setContentType("application/pdf");
+    		resp.setContentLength(bytes.length);
+    		ServletOutputStream ouputStream = resp.getOutputStream();
+    		ouputStream.write(bytes, 0, bytes.length);
+    		ouputStream.flush();
+    		ouputStream.close();
+
+        return "report generated";
+		
+	}
+	
 }

@@ -13,6 +13,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -42,8 +43,17 @@ public class Subject {
              joinColumns = { @JoinColumn(name = "subject_id") }, 
              inverseJoinColumns = { @JoinColumn(name = "course_id") })
 	private List<Course> courses = new ArrayList<Course>();
+	
+	private String semester;
+	
+	@Column(name="year_level")
+	private String curriculumYear;
 
 	private Boolean enable;
+	
+	@Transient
+	private Boolean selected = false;
+	
 
 	public Subject() {
 		this.enable = true;
@@ -87,8 +97,6 @@ public class Subject {
 	public void setDescriptiveTitle(String descriptiveTitle) {
 		this.descriptiveTitle = descriptiveTitle;
 	}
-	
-	
 
 	public Boolean getEnable() {
 		return enable;
@@ -104,6 +112,29 @@ public class Subject {
 
 	public void setCourses(List<Course> courses) {
 		this.courses = courses;
+	}
+	
+	public String getSemester() {
+		return semester;
+	}
+
+	public void setSemester(String semester) {
+		this.semester = semester;
+	}
+	public String getCurriculumYear() {
+		return curriculumYear;
+	}
+
+	public void setCurriculumYear(String curriculumYear) {
+		this.curriculumYear = curriculumYear;
+	}
+
+	public Boolean getSelected() {
+		return selected;
+	}
+
+	public void setSelected(Boolean selected) {
+		this.selected = selected;
 	}
 
 	@Override

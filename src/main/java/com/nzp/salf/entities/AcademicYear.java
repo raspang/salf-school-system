@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -21,11 +22,13 @@ public class AcademicYear {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotEmpty(message="is required")
 	@NotNull(message="is required")
 	@Size(min=9, message="is required")
 	@Column(name = "year")
 	private String year;
 	
+	@NotEmpty(message="is required")
 	@NotNull(message="is required")
 	@Size(min=1, message="is required")
 	@Column(name = "semester")

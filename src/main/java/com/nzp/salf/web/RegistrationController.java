@@ -2,6 +2,8 @@
 package com.nzp.salf.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,11 +27,13 @@ import com.nzp.salf.entities.Course;
 import com.nzp.salf.entities.Employee;
 import com.nzp.salf.entities.Student;
 import com.nzp.salf.entities.StudentRegistration;
+import com.nzp.salf.entities.Subject;
 import com.nzp.salf.exception.ResourceNotFoundException;
 import com.nzp.salf.repositories.AcademicYearRepository;
 import com.nzp.salf.repositories.EmployeeRepository;
 import com.nzp.salf.repositories.StudentRegistrationRepository;
 import com.nzp.salf.repositories.StudentRepository;
+import com.nzp.salf.repositories.SubjectRepository;
 import com.nzp.salf.services.RegistrationService;
 import com.nzp.salf.services.ReportService;
 import com.nzp.salf.services.SubjectService;
@@ -55,6 +59,9 @@ public class RegistrationController {
 	
 	@Autowired
 	private EmployeeRepository employeeRepository;
+	
+	@Autowired
+	private SubjectRepository subjectRepository;
 	
     @Autowired
     private ReportService reportService;
@@ -90,26 +97,37 @@ public class RegistrationController {
 	}
 	
 	
+	
 	@GetMapping("/showFormForAdd")
-	public String showFormForAdd(@RequestParam(name="studentId", required=true) Long theId, Model theModel) {
+	public String showFormForAdd(@RequestParam(name="id", required=true) Long theId, @RequestParam(name="curriculumYear", required=false) String theCurriculumYear, Model theModel) {
 		StudentRegistration studentRegistration = new StudentRegistration();
+		
 		
 		Employee registrar = employeeRepository.findFirstByPositionIdAndSelected("Registrar", true);
 		Employee assessmentOfficer = employeeRepository.findFirstByPositionIdAndSelected("Assessment Officer", true);
 		Student theStudent = studentRepository.findById(theId).orElseThrow( () -> new ResourceNotFoundException("Student", "id", theId));
 		Course theCourse = theStudent.getCourse();
 		
+		if(studentRegistration.getSubjects().isEmpty()) {
+			List<Subject> subjects = subjectRepository.findByCurriculumYearAndSemesterAndEnable(theCurriculumYear, getCurrentAcademicYear().getSemester(),true);
+			if(!subjects.isEmpty())
+				studentRegistration.setSubjects(subjects);
+		}		
 		studentRegistration.setRegistrar(registrar);
 		studentRegistration.setAssessmentOfficer(assessmentOfficer);
 		studentRegistration.setCourse(theCourse);
 		studentRegistration.setStudent(theStudent);
 		studentRegistration.setAcademicYear(getCurrentAcademicYear());
+		studentRegistration.setCurriculumYear(theCurriculumYear);
 		
 		theModel.addAttribute("subjects", subjectService.filterCourse(theCourse));
 		theModel.addAttribute("edit", false);
 		theModel.addAttribute("studentStr", theStudent.getFullName());
 		theModel.addAttribute("courseStr", theCourse.getTitle());
 		theModel.addAttribute("academicYearStr", getCurrentAcademicYear() != null ? getCurrentAcademicYear().getDisplayAcademicYear():"");
+		theModel.addAttribute("studentId", theStudent.getId());
+		theModel.addAttribute("semesterStr", getCurrentAcademicYear().getSemester());
+		theModel.addAttribute("curriculumYearStr", theCurriculumYear);
 		
 		theModel.addAttribute("studentRegistration", studentRegistration);
 		
@@ -117,18 +135,22 @@ public class RegistrationController {
 	}
 	
 	@GetMapping("/showFormForUpdate")
-	public String showFormForUpdate(@RequestParam("studentRegistrationId") Long theId, Model theModel) {
+	public String showFormForUpdate(@RequestParam("id") Long theId, @RequestParam(name="curriculumYear", required=false) String theCurriculumYear, Model theModel) {
 		
-		Optional<StudentRegistration> sReg = studentRegistrationRepository.findById(theId);
+		StudentRegistration studentRegistration = studentRegistrationRepository.findById(theId).orElseThrow(
+				() -> new ResourceNotFoundException("StudentRegistration", "id", theId));
 		
-		StudentRegistration studentRegistration = sReg.orElse(null);
+		studentRegistration.setCurriculumYear(theCurriculumYear);
 		
 		theModel.addAttribute("edit", true);
 		theModel.addAttribute("studentStr", studentRegistration.getStudent().getFullName());
 		theModel.addAttribute("courseStr", studentRegistration.getCourse().getTitle());
-		theModel.addAttribute("academicYearStr", getCurrentAcademicYear() != null ? getCurrentAcademicYear().getDisplayAcademicYear():"");
-		
+		theModel.addAttribute("academicYearStr", getCurrentAcademicYear() != null ? getCurrentAcademicYear().getDisplayAcademicYear():"");		
 		theModel.addAttribute("subjects", subjectService.filterCourse(studentRegistration.getCourse()));
+		theModel.addAttribute("studentId", studentRegistration.getStudent().getId());
+		theModel.addAttribute("semesterStr", getCurrentAcademicYear().getSemester());
+		theModel.addAttribute("curriculumYearStr", theCurriculumYear);
+		
 		theModel.addAttribute("studentRegistration", studentRegistration);
 		
 		return "registration/registration-form";	
@@ -143,7 +165,6 @@ public class RegistrationController {
 			success = "updated";
 		}
 
-		
 		boolean isRegistered = false;
 		if(theStudentRegistration.getId() == null )
 			isRegistered = registrationService.findExist(theStudentRegistration.getStudent(), getCurrentAcademicYear());
@@ -153,6 +174,7 @@ public class RegistrationController {
 			theModel.addAttribute("courseStr", theStudentRegistration.getCourse().getTitle());
 			theModel.addAttribute("academicYearStr", getCurrentAcademicYear() != null ? getCurrentAcademicYear().getDisplayAcademicYear():"");
 			theModel.addAttribute("subjects", subjectService.filterCourse(theStudentRegistration.getCourse()));
+			theModel.addAttribute("curriculumYearStr", theStudentRegistration.getCurriculumYear());
 			if(isRegistered)
 				theModel.addAttribute("registered",true);
 			return "registration/registration-form";	
@@ -192,9 +214,24 @@ public class RegistrationController {
     @GetMapping("/report/pdf/COR{id}-{lastname}")
     public String generateReport(HttpServletResponse resp, @PathVariable(name="id", required=true) Long id, @PathVariable String lastname) throws JRException, IOException {
         reportService.exportReport(resp, id);
-        return "registration/registrations";
+        return "redirect:/registrations/list";
     }
 	
+    @GetMapping("/report/pdf/all")
+	public String printReport(HttpServletResponse resp, HttpServletRequest request)  throws JRException, IOException{
+		  String keyword = request.getParameter("keyword");
+	      String academicYear = request.getParameter("academicYear");
+	      List<StudentRegistration> studentRegistrations = new ArrayList<>();
+	      if(!keyword.isEmpty() || !academicYear.isEmpty())
+	    	  studentRegistrations = studentRegistrationRepository.findAllOrderById(keyword, academicYear);
+	      else
+	    	  studentRegistrations = studentRegistrationRepository.findAllOrderById("", String.valueOf(getCurrentAcademicYear().getId()));
+	      
+	      reportService.exportReports(resp, studentRegistrations, academicYear);
+	      return "redirect:/registrations/list";
+	      
+	}
+    
 	@ModelAttribute("currentAcademicYear")
 	public AcademicYear getCurrentAcademicYear() {
 		return academicYearRepository.findByCurrent(true);

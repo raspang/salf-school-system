@@ -13,6 +13,7 @@
 	 <h1 class="h2 pt-3 mb-3 pb-2 border-bottom">Certificate of Registration Form</h1>
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
             <div class="col">
+           
               <form action="#" th:action="@{/registrations/save}" th:object="${studentRegistration}"  method="POST" class="needs-validation" autocomplete="off">
                	<input type="hidden" th:field="*{id}" />
                	<input type="hidden" th:field="*{student}"  />
@@ -20,6 +21,7 @@
                	<input type="hidden" th:field="*{academicYear}" />
                	<input type="hidden" th:field="*{registrar}"/>
                	<input type="hidden" th:field="*{assessmentOfficer}" />
+               	<input type="hidden" th:field="*{curriculumYear}" />
                	
                	<div th:if="${registered}">
                		<p style="color:red">Already registered!</p>
@@ -43,6 +45,19 @@
 				 </div>
 		 		 
 				 <div class="row">
+                   <div class="col-md-5 mb-3">
+                    <label for="curriculumYear"><code>*</code> Select Year Level</label>
+					<div class="input-group mb-3">
+					  <div class="input-group-prepend">
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='1st Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='1st Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">1st Year </a>
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='2nd Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='2nd Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">2nd Year </a>
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='3rd Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='3rd Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">3rd Year </a>
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='4th Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='4th Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">4th Year </a>
+					  </div>
+					</div>
+					<p style="color:red" th:if="${#fields.hasErrors('curriculumYear')}" th:errors="*{curriculumYear}"></p>
+                  </div>
+                  
                  <div class="col-md-4 mb-3">
                     <label for="dateOfRegistration">Date Of Registration</label>
                     <input
@@ -55,17 +70,7 @@
  					<p style="color:red" th:if="${#fields.hasErrors('dateOfRegistration')}" th:errors="*{dateOfRegistration}"></p>
                   </div>	            
                   
-                   <div class="col-md-4 mb-3">
-                    <label for="curriculumYear">Student Year Level</label>
-					<select th:field="*{curriculumYear}"class="form-control text-primary">
-						<option value="">Choose..</option>
-						<option value="1st Year">1st Year</option>
-						<option value="2nd Year">2nd Year</option>
-						<option value="3rd Year">3rd Year</option>
-						<option value="4th Year">4th Year</option>
-					</select>
-					<p style="color:red" th:if="${#fields.hasErrors('curriculumYear')}" th:errors="*{curriculumYear}"></p>
-                  </div>
+
     			 </div>
     			 <div class="row">
                     <div class="col-md-6 mb-3">

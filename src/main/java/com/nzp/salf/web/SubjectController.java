@@ -36,7 +36,7 @@ public class SubjectController{
 	@GetMapping("/list")
 	public String showSubjectsPageByPage(HttpServletRequest request, Model theModel) {
 		int page = 0; //default page number is 0 (yes it is weird)
-        int size = 10; //default page size is 10
+        int size = 15; //default page size is 10
         
         if (request.getParameter("page") != null && !request.getParameter("page").isEmpty()) {
             page = Integer.parseInt(request.getParameter("page")) - 1;

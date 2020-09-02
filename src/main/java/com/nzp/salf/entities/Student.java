@@ -21,6 +21,7 @@ import javax.validation.constraints.Size;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.nzp.salf.utils.DateUtils;
+import com.nzp.salf.validation.Unique;
 
 @Entity
 @Table(name="student")
@@ -32,6 +33,7 @@ public class Student {
 	
 	@NotEmpty(message="is required")
 	@Column(name="student_id", unique = true)
+	@Unique(message="is already exist")
 	private String studentId;
 
 	@NotNull(message="is required")

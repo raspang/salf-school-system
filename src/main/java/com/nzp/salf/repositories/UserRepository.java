@@ -11,5 +11,7 @@ import com.nzp.salf.entities.User;
 public interface UserRepository extends JpaRepository<User, Long>{
 
 	Optional<User> findByEmail(String email);
+	
+
 
 }

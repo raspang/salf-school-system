@@ -61,6 +61,12 @@ public class EmployeeController{
 			success = "updated";
 		}
 		
+		if(theEmployee.getSelected()) {
+			Employee theOther = employeeRepository.findFirstByPositionIdAndSelected(theEmployee.getPositionId(), true);
+			theOther.setSelected(false);
+			employeeRepository.save(theOther);
+		}
+		
 		employeeRepository.save(theEmployee);
 		return "redirect:/employees/list?success="+success;
 	}

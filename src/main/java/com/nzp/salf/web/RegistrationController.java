@@ -23,14 +23,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nzp.salf.entities.AcademicYear;
+import com.nzp.salf.entities.Billing;
+import com.nzp.salf.entities.BillingDetail;
 import com.nzp.salf.entities.Course;
 import com.nzp.salf.entities.Employee;
+import com.nzp.salf.entities.Payment;
 import com.nzp.salf.entities.Student;
 import com.nzp.salf.entities.StudentRegistration;
 import com.nzp.salf.entities.Subject;
 import com.nzp.salf.exception.ResourceNotFoundException;
 import com.nzp.salf.repositories.AcademicYearRepository;
+import com.nzp.salf.repositories.BillingRepository;
 import com.nzp.salf.repositories.EmployeeRepository;
+import com.nzp.salf.repositories.PaymentRepository;
 import com.nzp.salf.repositories.StudentRegistrationRepository;
 import com.nzp.salf.repositories.StudentRepository;
 import com.nzp.salf.repositories.SubjectRepository;
@@ -63,6 +68,12 @@ public class RegistrationController {
 	@Autowired
 	private SubjectRepository subjectRepository;
 	
+	@Autowired
+	private PaymentRepository paymentRepository;
+	
+	@Autowired
+	private BillingRepository billingRepository;
+	
     @Autowired
     private ReportService reportService;
     
@@ -71,6 +82,8 @@ public class RegistrationController {
 
     @Autowired
     private RegistrationService registrationService;
+    
+    
 
 	
 	@GetMapping("/list")
@@ -96,25 +109,44 @@ public class RegistrationController {
 		return "registration/registrations";
 	}
 	
-	
+
 	
 	@GetMapping("/showFormForAdd")
 	public String showFormForAdd(@RequestParam(name="id", required=true) Long theId, @RequestParam(name="curriculumYear", required=false) String theCurriculumYear, Model theModel) {
 		StudentRegistration studentRegistration = new StudentRegistration();
 		
-		
 		Employee registrar = employeeRepository.findFirstByPositionIdAndSelected("Registrar", true);
 		Employee assessmentOfficer = employeeRepository.findFirstByPositionIdAndSelected("Assessment Officer", true);
+		Employee cashier = employeeRepository.findFirstByPositionIdAndSelected("Cashier", true);
 		Student theStudent = studentRepository.findById(theId).orElseThrow( () -> new ResourceNotFoundException("Student", "id", theId));
 		Course theCourse = theStudent.getCourse();
-		
+
 		if(studentRegistration.getSubjects().isEmpty()) {
+			if(theCurriculumYear == null || theCurriculumYear.isEmpty()) {
+				int semNum = studentRegistrationRepository.findByStudentOrderByIdAsc(theStudent).size();
+				if(semNum == 0 || semNum == 1) {
+					theCurriculumYear = "1st Year";
+				}else if(semNum == 2 || semNum == 3) {
+					theCurriculumYear = "2nd Year";
+				}else if(semNum == 4 || semNum == 5) {
+					theCurriculumYear = "3rd Year";
+				}else {
+					theCurriculumYear = "4th Year";
+				}
+			}
 			List<Subject> subjects = subjectRepository.findByCurriculumYearAndSemesterAndEnable(theCurriculumYear, getCurrentAcademicYear().getSemester(),true);
 			if(!subjects.isEmpty())
 				studentRegistration.setSubjects(subjects);
-		}		
+		}
+		List<Payment> payments = registrationService.getPayments(studentRegistration);
+		Double totalFees = 0d;
+		for(Payment payment : payments) {
+			if(payment.getAmount() != null)
+				totalFees += payment.getAmount();
+		}
 		studentRegistration.setRegistrar(registrar);
 		studentRegistration.setAssessmentOfficer(assessmentOfficer);
+		studentRegistration.setCashier(cashier);
 		studentRegistration.setCourse(theCourse);
 		studentRegistration.setStudent(theStudent);
 		studentRegistration.setAcademicYear(getCurrentAcademicYear());
@@ -128,7 +160,8 @@ public class RegistrationController {
 		theModel.addAttribute("studentId", theStudent.getId());
 		theModel.addAttribute("semesterStr", getCurrentAcademicYear().getSemester());
 		theModel.addAttribute("curriculumYearStr", theCurriculumYear);
-		
+		theModel.addAttribute("payments",  payments);
+		theModel.addAttribute("totalFees", totalFees);
 		theModel.addAttribute("studentRegistration", studentRegistration);
 		
 		return "registration/registration-form";
@@ -139,8 +172,13 @@ public class RegistrationController {
 		
 		StudentRegistration studentRegistration = studentRegistrationRepository.findById(theId).orElseThrow(
 				() -> new ResourceNotFoundException("StudentRegistration", "id", theId));
-		
-		studentRegistration.setCurriculumYear(theCurriculumYear);
+
+		List<Payment> payments = paymentRepository.findByStudentRegistration(studentRegistration);
+		Double totalFees = 0d;
+		for(Payment payment : payments) {
+			if(payment.getAmount() != null)
+				totalFees += payment.getAmount();
+		}
 		
 		theModel.addAttribute("edit", true);
 		theModel.addAttribute("studentStr", studentRegistration.getStudent().getFullName());
@@ -149,8 +187,9 @@ public class RegistrationController {
 		theModel.addAttribute("subjects", subjectService.filterCourse(studentRegistration.getCourse()));
 		theModel.addAttribute("studentId", studentRegistration.getStudent().getId());
 		theModel.addAttribute("semesterStr", getCurrentAcademicYear().getSemester());
-		theModel.addAttribute("curriculumYearStr", theCurriculumYear);
-		
+		theModel.addAttribute("curriculumYearStr", studentRegistration.getCurriculumYear());
+		theModel.addAttribute("payments", payments);
+		theModel.addAttribute("totalFees", totalFees);
 		theModel.addAttribute("studentRegistration", studentRegistration);
 		
 		return "registration/registration-form";	
@@ -164,31 +203,50 @@ public class RegistrationController {
 		if(theStudentRegistration.getId() != null) {
 			success = "updated";
 		}
-
-		boolean isRegistered = false;
-		if(theStudentRegistration.getId() == null )
-			isRegistered = registrationService.findExist(theStudentRegistration.getStudent(), getCurrentAcademicYear());
-
-		if(bindingResult.hasErrors() || isRegistered) {
+		List<Payment> payments = new ArrayList<>();
+		Payment unitPayment = null;
+		
+		boolean isRegisteredExist = false;
+		if(theStudentRegistration.getId() == null ) {
+			isRegisteredExist = registrationService.findExist(theStudentRegistration.getStudent(), getCurrentAcademicYear());
+			payments = registrationService.getPayments(theStudentRegistration);
+			
+		}else {
+			payments = paymentRepository.findByStudentRegistration(theStudentRegistration);
+			
+			Billing unitBilling = billingRepository.findFirstByPaymentDetail(BillingDetail.UNITS.getDetail());
+			if(unitBilling != null) {
+				unitPayment = paymentRepository.findFirstByPaymentDetailAndStudentRegistration(BillingDetail.UNITS.getDetail(), theStudentRegistration);
+				unitPayment.setAmount(theStudentRegistration.getTotalUnits()*unitBilling.getAmount());
+			}
+		}
+		
+		if(bindingResult.hasErrors() || isRegisteredExist) {
 			theModel.addAttribute("studentStr", theStudentRegistration.getStudent().getFullName());
 			theModel.addAttribute("courseStr", theStudentRegistration.getCourse().getTitle());
 			theModel.addAttribute("academicYearStr", getCurrentAcademicYear() != null ? getCurrentAcademicYear().getDisplayAcademicYear():"");
 			theModel.addAttribute("subjects", subjectService.filterCourse(theStudentRegistration.getCourse()));
 			theModel.addAttribute("curriculumYearStr", theStudentRegistration.getCurriculumYear());
-			if(isRegistered)
-				theModel.addAttribute("registered",true);
+			theModel.addAttribute("payments", payments);
+			if(isRegisteredExist) {
+				theModel.addAttribute("registered",true);			
+			}
 			return "registration/registration-form";	
 		}
 		
 		studentRegistrationRepository.save(theStudentRegistration);
 		
+		/* Save payment of Student*/
+		paymentRepository.saveAll(payments);
+		
+		if(unitPayment != null) {
+			paymentRepository.save(unitPayment);
+		}
 		/* Update the status of student registered */
 		Student theStudent = theStudentRegistration.getStudent();
 		theStudent.setIsRegistered(true);
-		
-		
 		studentRepository.save(theStudent);
-		
+
 		return "redirect:/registrations/list?success="+success;
 	}
 	
@@ -211,21 +269,22 @@ public class RegistrationController {
 	}
 
 
-    @GetMapping("/report/pdf/COR{id}-{lastname}")
-    public String generateReport(HttpServletResponse resp, @PathVariable(name="id", required=true) Long id, @PathVariable String lastname) throws JRException, IOException {
+    @GetMapping("/report/pdf/COR-{lastname}-{id}")
+    public String generateReport(HttpServletResponse resp, HttpServletRequest request,  @PathVariable(name="id", required=true) Long id, 
+    		@PathVariable String lastname) throws JRException, IOException {
         reportService.exportReport(resp, id);
         return "redirect:/registrations/list";
     }
 	
-    @GetMapping("/report/pdf/all")
+    @GetMapping("/report/pdf/registered-list")
 	public String printReport(HttpServletResponse resp, HttpServletRequest request)  throws JRException, IOException{
-		  String keyword = request.getParameter("keyword");
+	
 	      String academicYear = request.getParameter("academicYear");
 	      List<StudentRegistration> studentRegistrations = new ArrayList<>();
-	      if(!keyword.isEmpty() || !academicYear.isEmpty())
-	    	  studentRegistrations = studentRegistrationRepository.findAllOrderById(keyword, academicYear);
-	      else
-	    	  studentRegistrations = studentRegistrationRepository.findAllOrderById("", String.valueOf(getCurrentAcademicYear().getId()));
+	      if(academicYear.isEmpty() || academicYear == null)
+	    	  academicYear = String.valueOf(getCurrentAcademicYear().getId());
+	    	  
+	      studentRegistrations = studentRegistrationRepository.findAllOrderById("", academicYear);
 	      
 	      reportService.exportReports(resp, studentRegistrations, academicYear);
 	      return "redirect:/registrations/list";
@@ -237,5 +296,8 @@ public class RegistrationController {
 		return academicYearRepository.findByCurrent(true);
 	}
 	
+
+	
+
 	
 }

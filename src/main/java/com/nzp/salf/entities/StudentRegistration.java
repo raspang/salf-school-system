@@ -19,6 +19,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.nzp.salf.utils.DateUtils;
@@ -48,12 +50,22 @@ public class StudentRegistration {
 	@JoinColumn(name="academic_year_id")
 	private AcademicYear academicYear;
 	
-	@ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinColumn(name="registrar_id")
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "registrar_id", nullable = true)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Employee registrar;
 	
-	@ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinColumn(name="assessment_officer_id")
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "cashier_id", nullable = true)
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private Employee cashier;
+	
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = true)
+	@JoinColumn(name = "assessment_officer_id", nullable = true)
+	@OnDelete(action = OnDeleteAction.CASCADE)
 	private Employee assessmentOfficer;
 	
 	@NotEmpty(message="is required")
@@ -65,6 +77,15 @@ public class StudentRegistration {
 	@DateTimeFormat (pattern="yyyy-MM-dd")
 	private LocalDate dateOfRegistration;
 	
+	
+	private Double less;
+	
+	private Double balance;
+	
+	@Column(name="payment_per_exam")
+	private Double paymentPerExam;
+	
+
 	@NotEmpty(message="cannot be empty")
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(name = "student_subject", 
@@ -212,8 +233,6 @@ public class StudentRegistration {
 	}
 
 
-	
-
 	public Boolean getEnable() {
 		return enable;
 	}
@@ -221,6 +240,47 @@ public class StudentRegistration {
 
 	public void setEnable(Boolean enable) {
 		this.enable = enable;
+	}
+
+
+	public Double getLess() {
+		return less;
+	}
+
+
+	public void setLess(Double less) {
+		this.less = less;
+	}
+
+
+	public Double getBalance() {
+		return balance;
+	}
+
+
+	public void setBalance(Double balance) {
+		this.balance = balance;
+	}
+
+
+	public Double getPaymentPerExam() {
+		return paymentPerExam;
+	}
+
+
+	public void setPaymentPerExam(Double paymentPerExam) {
+		this.paymentPerExam = paymentPerExam;
+	}
+
+	
+
+	public Employee getCashier() {
+		return cashier;
+	}
+
+
+	public void setCashier(Employee cashier) {
+		this.cashier = cashier;
 	}
 
 

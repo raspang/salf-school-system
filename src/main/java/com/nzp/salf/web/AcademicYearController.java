@@ -50,15 +50,7 @@ public class AcademicYearController{
 		return "academicyear/academicyear-form";
 	}
 	
-	/*
-	 * @GetMapping("/showFormForUpdate") public String
-	 * showFormForUpdate(@RequestParam("academicYearId") Long theId, Model theModel)
-	 * { Optional<AcademicYear> academicYear =
-	 * academicYearRepository.findById(theId); theModel.addAttribute("academicYear",
-	 * academicYear); theModel.addAttribute("edit", true); return
-	 * "academicyear/academicyear-form"; }
-	 */
-	
+
 
 	@PostMapping("/save")
 	public String saveCourse(@Valid @ModelAttribute("academicYear") AcademicYear theAcademicYear,

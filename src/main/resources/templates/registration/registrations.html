@@ -55,7 +55,7 @@
 			
 			<div class="col-md-2 mt-3">
 				<div style="text-align:right;">
-					<a th:href="@{/registrations/report/pdf/all(keyword=${keyword},academicYear=${academicYear})}"  class=" btn btn-secondary m-2">PDF</a>
+					<a th:href="@{/registrations/report/pdf/registered-list(academicYear=${academicYear})}"  class=" btn btn-outline-primary m-2">Registration List</a>
 				</div>
 			</div>
 			</div>
@@ -114,7 +114,7 @@
 						</td>
 						<td class="text-center" ><span th:text="${temp.totalUnits}">Total Units</span></td>
 						<td>
-							<a th:href="@{/registrations/report/pdf/COR{id}-{lastname}(id=${temp.id},lastname=${temp.student.lastName})}"  target="_blank" class="btn btn-sm btn-outline-secondary">PDF</a>
+							<a th:href="@{/registrations/report/pdf/COR-{lastname}-{id}(id=${temp.id},lastname=${temp.student.lastName})}"  target="_blank" class="btn btn-sm btn-outline-primary">COR</a>
 						</td>
 						<td>
 							<div th:if="${currentAcademicYear.id == temp.academicYear.id}" class="text-center btn-group-sm"

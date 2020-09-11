@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Billing List</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+		<div
+			class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+			<h1 class="h2">Billings</h1>
+
+		</div>
+		
+		<div class="alert alert-success" role="alert" th:if="${param.success != null}">
+		 	Billing has been successfully <span th:text="${param.success}"></span>.
+		</div>
+		
+
+		<a th:href="@{/billings/showFormForAdd}"  class="btn btn-primary m-2">Add</a>
+	
+		<div class="table-responsive">
+			<table class="table table-striped table-sm">
+				<thead>
+					<tr>
+						<th>Billing Detail</th>
+						<th>Amount</th>
+						<th>Specified Course</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="temp : ${billings}">
+						<td><span th:text="${temp.paymentDetail}">payment detail</span></td>
+						<td><span th:text="${temp.amount}">Amount</span></td>
+						<td>
+							<th:block th:if="${temp.course != null}">
+								<span th:text="${temp.course.title}">Course</span>
+							</th:block>
+						</td>
+						<td>
+							<div class="text-center btn-group-sm"
+								style="color: white; display: flex; justify-content: space-evenly;">
+								<a th:href="@{/billings/showFormForUpdate(billingId=${temp.id})}" class="btn-sm btn-warning">Edit </a> 
+								<div sec:authorize="hasRole('ROLE_ADMIN')">
+								<a th:href="@{/billings/delete(billingId=${temp.id})}" class="btn-sm btn-danger"
+								onclick="if (!(confirm('Are you sure you want to delete this billing?'))) return false"
+								>Delete </a>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+
+	</div>
+</body>
+
+</html>

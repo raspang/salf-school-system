@@ -1,5 +1,6 @@
 package com.nzp.salf.services;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,17 +9,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
+import com.nzp.salf.entities.AcademicYear;
+import com.nzp.salf.entities.Payment;
 import com.nzp.salf.entities.Report;
 import com.nzp.salf.entities.StudentRegistration;
 import com.nzp.salf.entities.Subject;
+import com.nzp.salf.exception.ResourceNotFoundException;
 import com.nzp.salf.repositories.AcademicYearRepository;
+import com.nzp.salf.repositories.PaymentRepository;
 import com.nzp.salf.repositories.StudentRegistrationRepository;
 
 import net.sf.jasperreports.engine.JRException;
@@ -36,6 +43,9 @@ public class ReportService {
 	@Autowired
 	private AcademicYearRepository academicYearRepository;
 	
+	@Autowired 
+	private PaymentRepository paymentRepository;
+	
 	public String exportReport(HttpServletResponse resp, Long id) throws JRException, IOException {
 		
 		byte[] bytes = null;
@@ -48,7 +58,9 @@ public class ReportService {
 		if(theStudentRegistration != null)
 			subjects = theStudentRegistration.getSubjects();
 		
-        File file = ResourceUtils.getFile("classpath:students.jrxml");
+		
+		
+        File file = ResourceUtils.getFile("classpath:cor.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(subjects);
         Map<String, Object> parameters = new HashMap<>();
@@ -69,8 +81,69 @@ public class ReportService {
 	    	parameters.put("academicYear", theStudentRegistration.getAcademicYear().getYear());
 	    	parameters.put("principal", theStudentRegistration.getRegistrar() != null ? theStudentRegistration.getRegistrar().getFullName() : "");
 	    	parameters.put("assessmentOfficer", theStudentRegistration.getAssessmentOfficer() != null ? theStudentRegistration.getAssessmentOfficer().getFullName() : "");
+	    	parameters.put("name", theStudentRegistration.getStudent().getFullName());
+	    	
+	    	List<Payment> studentPayments = paymentRepository.findByStudentRegistration(theStudentRegistration);
+	    	Double totalFees = 0d;
+	    	for(Payment payment: studentPayments) {
+	    		String title = payment.getPaymentDetail();
+	    		title = title.replaceAll("\\s+","").toLowerCase();
+	    		
+	    		parameters.put(title, String.valueOf(payment.getAmount()));
+	    		totalFees += payment.getAmount();
+	    	}
+	    	parameters.put("totalfees", String.valueOf(totalFees));
+	    	if(theStudentRegistration.getLess() != null && theStudentRegistration.getLess() > 0d)
+	    		parameters.put("less", String.valueOf(theStudentRegistration.getLess()));
+			
+			 if(theStudentRegistration.getBalance() != null && theStudentRegistration.getBalance() > 0d)
+				 parameters.put("balance", String.valueOf(theStudentRegistration.getBalance()));
+			 
+			 if(theStudentRegistration.getPaymentPerExam() != null && theStudentRegistration.getPaymentPerExam() > 0d)
+			  parameters.put("paymentperexam",  String.valueOf(theStudentRegistration.getPaymentPerExam()));	
+			 
+			 
+			 if(theStudentRegistration.getRegistrar() != null) {
+				 
+				 parameters.put("registrar", theStudentRegistration.getRegistrar().getFullName());
+				 
+				 String name = theStudentRegistration.getRegistrar().getFullName().replaceAll("\\s+","").toLowerCase();
+				 
+				 if(name.equalsIgnoreCase("jhonaq.baillespin")) {
+					BufferedImage image1 =  null;
+					try {
+					 File initialImage = ResourceUtils.getFile("classpath:jhona.png");
+					 image1 = ImageIO.read(initialImage);
+					}catch(Exception e) {}
+					parameters.put("jhona", image1);
+				 }
+				
+			 }
+			 if(theStudentRegistration.getCashier() != null) {
+				 parameters.put("cashier", theStudentRegistration.getCashier().getFullName());
+				 
+				 String name = theStudentRegistration.getCashier().getFullName().replaceAll("\\s+","").toLowerCase();
+				 
+				 if(name.equalsIgnoreCase("raidak.salibo")) {
+					BufferedImage image1 =  null;
+					try {
+					 File initialImage = ResourceUtils.getFile("classpath:raida.png");
+					 image1 = ImageIO.read(initialImage);
+					}catch(Exception e) {}
+					parameters.put("raida", image1);
+				 }
+			 }
+				
+				
         }
         
+
+		
+		  for(int i = 1; i <= subjects.size(); i++) {
+			  parameters.put("courseNo"+String.valueOf(i), subjects.get(i-1).getTitle());
+			  parameters.put("courseDesc"+String.valueOf(i), subjects.get(i-1).getDescriptiveTitle()); 
+		  }
+		 
         	bytes = JasperRunManager.runReportToPdf(jasperReport, parameters, dataSource);
         	
     		resp.reset();
@@ -89,6 +162,9 @@ public class ReportService {
 
 	public String exportReports(HttpServletResponse resp, List<StudentRegistration> studentRegistrations, String academicYear) throws JRException, IOException {
 
+        AcademicYear aY = academicYearRepository.findById(Long.parseLong(academicYear)).orElseThrow(
+        		() -> new ResourceNotFoundException("AcademicYear", "id", academicYear));
+        
 		List<Report> reports = new ArrayList<>();
 		for(StudentRegistration sR: studentRegistrations) {
 			Report report = new Report();
@@ -109,12 +185,12 @@ public class ReportService {
 		
 		
 		byte[] bytes = null;
-        File file = ResourceUtils.getFile("classpath:report_landscape.jrxml");
+        File file = ResourceUtils.getFile("classpath:registered.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reports);
         Map<String, Object> parameters = new HashMap<>();
-        
-           parameters.put("academicYear", academicYear);
+
+           parameters.put("academicYear", aY.getDisplayAcademicYear());
         
         	bytes = JasperRunManager.runReportToPdf(jasperReport, parameters, dataSource);
         	

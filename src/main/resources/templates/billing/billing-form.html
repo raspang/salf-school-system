@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3"
+	layout:decorator="layout">
+<head>
+<title>Student Form</title>
+</head>
+<body>
+	<div layout:fragment="content">
+
+	 <h1 class="h2 pt-3 mb-3 pb-2 border-bottom">Billing Form</h1>
+          <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3">
+            <div class="col">
+              <form action="#" th:action="@{/billings/save}" th:object="${billing}"  method="POST" class="needs-validation" autocomplete="off">
+               	<input type="hidden" th:field="*{id}" />
+                <div class="row">
+                
+                   <div class="col-md-5 mb-3">
+                    <label for="paymentDetail">Billing Detail</label>
+					<select id="paymentDetail" class="form-control text-primary" th:field="*{paymentDetail}">
+ 					    <option th:each="p : ${paymentDetails}"
+					            th:value="${p}"
+					            th:text="${p}">Billing Detail</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('paymentDetail')}" th:errors="*{paymentDetail}"></p> 
+                  </div>
+   
+                  <div class="col-md-4 mb-3">
+                    <label for="amount">Amount</label>
+                    <input
+                      type="number"
+                      class="form-control"
+                      id="amount"
+                      th:field="*{amount}"
+                      placeholder=""
+                      value=""                      
+                    />
+                    <p style="color:red" th:if="${#fields.hasErrors('amount')}" th:errors="*{amount}"></p> 
+                  </div>  
+                  
+                   </div>
+                    <div class="row">
+                  
+                   <div class="col-md-5 mb-3">
+                    <label for="course">Billing specified to a Course (Optional)</label>
+					<select id="course" class="form-control text-primary" th:field="*{course}" >
+						<option label="-- No Selected --" value=""></option>
+					    <option th:each="course : ${courses}"
+					            th:value="${{course}}"
+					            th:text="${course.title}">Course Title</option>
+					</select>
+					<p style="color:red" th:if="${#fields.hasErrors('course')}" th:errors="*{course}"></p>
+               	   </div>
+                   </div>
+                
+
+                <hr class="mb-4" />
+                <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  Save
+                </button>
+               
+				</form>
+				<br>
+				 <a th:href="@{/billings/list}" >Back to Billings List</a>
+			</div>
+	</div>
+	</div>
+</body>
+
+</html>

@@ -27,5 +27,7 @@ public interface StudentRegistrationRepository extends JpaRepository<StudentRegi
 	
 	List<StudentRegistration> findByStudentAndAcademicYear(Student student, AcademicYear academicYear);
 	
+	List<StudentRegistration> findByStudentOrderByIdAsc(Student student);
+	
 }
 	

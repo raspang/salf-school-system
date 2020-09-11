@@ -21,6 +21,7 @@
                	<input type="hidden" th:field="*{academicYear}" />
                	<input type="hidden" th:field="*{registrar}"/>
                	<input type="hidden" th:field="*{assessmentOfficer}" />
+               	<input type="hidden" th:field="*{cashier}" />
                	<input type="hidden" th:field="*{curriculumYear}" />
                	
                	<div th:if="${registered}">
@@ -45,20 +46,8 @@
 				 </div>
 		 		 
 				 <div class="row">
-                   <div class="col-md-5 mb-3">
-                    <label for="curriculumYear"><code>*</code> Select Year Level</label>
-					<div class="input-group mb-3">
-					  <div class="input-group-prepend">
-					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='1st Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='1st Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">1st Year </a>
-					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='2nd Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='2nd Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">2nd Year </a>
-					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='3rd Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='3rd Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">3rd Year </a>
-					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='4th Year'} ? active : text-muted" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='4th Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">4th Year </a>
-					  </div>
-					</div>
-					<p style="color:red" th:if="${#fields.hasErrors('curriculumYear')}" th:errors="*{curriculumYear}"></p>
-                  </div>
-                  
-                 <div class="col-md-4 mb-3">
+				 
+				   <div class="col-md-4 mb-3">
                     <label for="dateOfRegistration">Date Of Registration</label>
                     <input
                       type="date"
@@ -68,21 +57,60 @@
                       required
                     />
  					<p style="color:red" th:if="${#fields.hasErrors('dateOfRegistration')}" th:errors="*{dateOfRegistration}"></p>
-                  </div>	            
+                  </div>
                   
+                   <div class="col-md-5 mb-3">
+                    <label for="">Student Year Level</label>
+					<div class="input-group mb-3">
+					  <div class="input-group-prepend" th:style="${edit} ? 'pointer-events: none;opacity: 0.4;' : ''">
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='1st Year'} ? active : ''" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='1st Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">1st Year </a>
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='2nd Year'} ? active : ''" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='2nd Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">2nd Year </a>
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='3rd Year'} ? active : ''" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='3rd Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">3rd Year </a>
+					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='4th Year'} ? active : ''" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='4th Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">4th Year </a>
+					  </div>
+					</div>
+					
+					<p style="color:red" th:if="${#fields.hasErrors('curriculumYear')}" th:errors="*{curriculumYear}"></p>
+                  </div>
 
     			 </div>
     			 <div class="row">
-                    <div class="col-md-6 mb-3">
-                    <label for="title">Subject (press <code>ctrl</code> to click multiple subjects)</label>
+                    <div class="col-md-4 mb-3">
+                    <label for="subject">Subject (press <code>ctrl</code> to click multiple subjects)</label>
 					<select class="form-control text-primary" th:field="*{subjects}" size="15" multiple="multiple">
 					    <option th:each="subject : ${subjects}"
 					            th:value="${{subject}}"
-					            th:text="${subject}">Course Title</option>
+					            th:text="${subject}">Subject Title</option>
 					</select>
 					<p style="color:red" th:if="${#fields.hasErrors('subjects')}" th:errors="*{subjects}"></p>
                   </div>
-                 </div>
+                  <div class="col-md-1 mb-3 ">
+                  </div>
+                <div class="col-md-4 mb-3 ">
+                    <label for="payments">Payment Details</label>
+
+					<table class="table">
+					  <tbody class="text-muted">
+					    <tr th:each="payment : ${payments}">
+					      <th th:text="${payment.paymentDetail}"></th>
+					      <td th:text="${payment.amount}"></td>
+					    </tr>
+					    <tr>
+					    	<th>Less</th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{less}"/></th>
+					    </tr>
+					   <tr>
+					    	<th>Balance</th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{balance}"/></th>
+					    </tr>
+					    <tr>
+					    	<th>Payment Per Exam</th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{paymentPerExam}"/></th>
+					    </tr>
+					  </tbody>
+					</table>
+		            </div>
+             </div>
                   
 
                 <hr class="mb-4" />

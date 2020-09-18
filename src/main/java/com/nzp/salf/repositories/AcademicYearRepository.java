@@ -11,7 +11,7 @@ public interface AcademicYearRepository extends JpaRepository<AcademicYear, Long
 
 	List<AcademicYear> findByEnableOrderByIdDesc(Boolean enable);
 	
-	AcademicYear findByCurrent(Boolean current);
+	AcademicYear findFirstByCurrent(Boolean current);
 	
 	Boolean existsByYearAndSemester(String year, String semester);
 	

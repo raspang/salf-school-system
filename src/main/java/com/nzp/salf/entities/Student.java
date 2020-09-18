@@ -16,12 +16,12 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.nzp.salf.utils.DateUtils;
-import com.nzp.salf.validation.Unique;
+
 
 @Entity
 @Table(name="student")
@@ -32,25 +32,21 @@ public class Student {
 	private Long id;
 	
 	@NotEmpty(message="is required")
-	@Column(name="student_id", unique = true)
-	@Unique(message="is already exist")
+	@Column(name="student_id")
 	private String studentId;
 
-	@NotNull(message="is required")
-	@Size(min=3, message="is required")
+	@NotEmpty(message="is required")
 	@Column(name="first_name")
 	private String firstName;
 	
 	@Column(name="middle_name")
 	private String middleName;
 
-	@NotNull(message="is required")
-	@Size(min=3, message="is required")
+	@NotEmpty(message="is required")
 	@Column(name="last_name")
 	private String lastName;
 	
-	@NotNull(message="is required")
-	@Size(min=3, message="is required")
+	@NotEmpty(message="is required")
 	@Column(name="address")
 	private String address;
 	
@@ -63,9 +59,9 @@ public class Student {
 	@DateTimeFormat (pattern="yyyy-MM-dd")
 	private LocalDate dateOfRegistration;
 	
+	@JsonIgnore
 	@OneToMany(mappedBy="student")
 	private List<StudentRegistration> studentRegistrations;
-	
 	
 	@NotNull(message="is required")
 	@OneToOne(cascade=CascadeType.DETACH)

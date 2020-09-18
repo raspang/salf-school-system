@@ -6,7 +6,6 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -154,7 +153,7 @@ public class AcademicYearController{
 	
 	@ModelAttribute("currentAcademicYear")
 	public AcademicYear getAcademicYear() {
-		return academicYearRepository.findByCurrent(true);
+		return academicYearRepository.findFirstByCurrent(true);
 	}
 	
 }

@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +17,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.nzp.salf.entities.AcademicYear;
-import com.nzp.salf.entities.Payment;
 import com.nzp.salf.entities.Report;
 import com.nzp.salf.entities.StudentRegistration;
 import com.nzp.salf.entities.Subject;
 import com.nzp.salf.exception.ResourceNotFoundException;
 import com.nzp.salf.repositories.AcademicYearRepository;
-import com.nzp.salf.repositories.PaymentRepository;
 import com.nzp.salf.repositories.StudentRegistrationRepository;
+import com.nzp.salf.utils.ThreadGenerate;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.JasperRunManager;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -43,15 +43,36 @@ public class ReportService {
 	@Autowired
 	private AcademicYearRepository academicYearRepository;
 	
-	@Autowired 
-	private PaymentRepository paymentRepository;
+
+	class Multi extends Thread{  
+		public void run(){  
+		System.out.println("thread is running...");  
+		}  
+
+	}  
+	public void exportAllReport(HttpServletResponse resp) throws JRException, IOException {
+		List<StudentRegistration> students = studentRegistrationRepository.findByAcademicYearOrderByIdDesc(academicYearRepository.findFirstByCurrent(true));
 	
+		new ThreadGenerate();
+	      try {
+	    
+	    	  for(StudentRegistration student : students) {
+	    		  exportReport( resp, student.getId());
+	    		  Thread.sleep(1000);
+	    		
+	    	  }
+	         
+	       } catch (InterruptedException e) {
+	          System.out.println("The Main thread is interrupted");
+	       }
+		
+	}
 	public String exportReport(HttpServletResponse resp, Long id) throws JRException, IOException {
 		
-		byte[] bytes = null;
-	
-		Optional<StudentRegistration> studentRegistration = studentRegistrationRepository.findById(id);
-		StudentRegistration theStudentRegistration = studentRegistration.orElse(null);
+
+		
+		StudentRegistration theStudentRegistration = studentRegistrationRepository.findById(id).orElseThrow(
+				() -> new ResourceNotFoundException("StudentRegistration", "id", id));
 		
 		List<Subject> subjects = new ArrayList<>();
 		
@@ -82,25 +103,36 @@ public class ReportService {
 	    	parameters.put("principal", theStudentRegistration.getRegistrar() != null ? theStudentRegistration.getRegistrar().getFullName() : "");
 	    	parameters.put("assessmentOfficer", theStudentRegistration.getAssessmentOfficer() != null ? theStudentRegistration.getAssessmentOfficer().getFullName() : "");
 	    	parameters.put("name", theStudentRegistration.getStudent().getFullName());
-	    	
-	    	List<Payment> studentPayments = paymentRepository.findByStudentRegistration(theStudentRegistration);
-	    	Double totalFees = 0d;
-	    	for(Payment payment: studentPayments) {
-	    		String title = payment.getPaymentDetail();
-	    		title = title.replaceAll("\\s+","").toLowerCase();
-	    		
-	    		parameters.put(title, String.valueOf(payment.getAmount()));
-	    		totalFees += payment.getAmount();
+
+	    	if(theStudentRegistration.getEntrance() != null && theStudentRegistration.getEntrance() > 0d) {
+	    		parameters.put("entrance", String.format("%.2f",theStudentRegistration.getEntrance()));
 	    	}
-	    	parameters.put("totalfees", String.valueOf(totalFees));
-	    	if(theStudentRegistration.getLess() != null && theStudentRegistration.getLess() > 0d)
-	    		parameters.put("less", String.valueOf(theStudentRegistration.getLess()));
-			
-			 if(theStudentRegistration.getBalance() != null && theStudentRegistration.getBalance() > 0d)
-				 parameters.put("balance", String.valueOf(theStudentRegistration.getBalance()));
+	    	if(theStudentRegistration.getUnitsPrice() != null && theStudentRegistration.getUnitsPrice() > 0d) {
+	    		parameters.put("noofunits", String.format("%.2f",theStudentRegistration.getUnitsPrice()));
+	    	}	    		
+	    	if(theStudentRegistration.getMiscellaneous() != null && theStudentRegistration.getMiscellaneous() > 0d) {
+	    		parameters.put("miscellaneous", String.format("%.2f",theStudentRegistration.getMiscellaneous()));
+	    	}				
+	    	if(theStudentRegistration.getLaboratory() != null && theStudentRegistration.getLaboratory() > 0d) {
+	    		parameters.put("laboratory", String.format("%.2f",theStudentRegistration.getLaboratory()));
+	    	}		
+	    	if(theStudentRegistration.getEvaluation() != null && theStudentRegistration.getEvaluation() > 0d) {
+	    		parameters.put("evaluationfee", String.format("%.2f",theStudentRegistration.getEvaluation()));
+	    	}	
+	    	    	
+	    	parameters.put("totalfees", String.format("%.2f",theStudentRegistration.getTotalfees()));
+	    	
+	    	if(theStudentRegistration.getLess() != null && theStudentRegistration.getLess() > 0d) {
+	    		parameters.put("less", String.format("%.2f",theStudentRegistration.getLess()));
+	    	}
+	    		
+			if(theStudentRegistration.getBalance() != null && theStudentRegistration.getBalance() > 0d)
+				 parameters.put("balance", String.format("%.2f",theStudentRegistration.getBalance()));
 			 
-			 if(theStudentRegistration.getPaymentPerExam() != null && theStudentRegistration.getPaymentPerExam() > 0d)
-			  parameters.put("paymentperexam",  String.valueOf(theStudentRegistration.getPaymentPerExam()));	
+			if(theStudentRegistration.getPaymentPerExam() != null && theStudentRegistration.getPaymentPerExam() > 0d)
+			  parameters.put("paymentperexam",  String.format("%.2f",theStudentRegistration.getPaymentPerExam()));	
+			 
+			 
 			 
 			 
 			 if(theStudentRegistration.getRegistrar() != null) {
@@ -144,7 +176,9 @@ public class ReportService {
 			  parameters.put("courseDesc"+String.valueOf(i), subjects.get(i-1).getDescriptiveTitle()); 
 		  }
 		 
-        	bytes = JasperRunManager.runReportToPdf(jasperReport, parameters, dataSource);
+		  String path = "C:\\Users\\"+System.getProperty("user.name")+"\\Desktop\\Report";
+		  
+        /*	bytes = JasperRunManager.runReportToPdf(jasperReport, parameters, dataSource);
         	
     		resp.reset();
     		resp.resetBuffer();
@@ -154,6 +188,13 @@ public class ReportService {
     		ouputStream.write(bytes, 0, bytes.length);
     		ouputStream.flush();
     		ouputStream.close();
+    	*/
+		  
+	        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+	  
+	        JasperExportManager.exportReportToPdfFile(jasperPrint, path + "\\COR-"+theStudentRegistration.getStudent().getLastName().toUpperCase()+"-"+theStudentRegistration.getId()+".pdf");
+	 
+		  
 
         return "report generated";
 		

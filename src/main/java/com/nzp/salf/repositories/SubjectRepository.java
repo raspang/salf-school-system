@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import com.nzp.salf.entities.Course;
 import com.nzp.salf.entities.Subject;
 
 
@@ -16,5 +17,7 @@ public interface SubjectRepository extends JpaRepository<Subject, Long>{
 	Page<Subject> findAll(String keyword, Pageable pageable);
 
 	List<Subject> findByCurriculumYearAndSemesterAndEnable(String curriculumYear, String semester, Boolean enable);
+	
+	Boolean existsByTitle(String title);
 }
 	

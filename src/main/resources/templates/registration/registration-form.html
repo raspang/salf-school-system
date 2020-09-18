@@ -29,17 +29,21 @@
                	</div>
                	
                <div class="row">
-                  <div class="col-md-4 mb-3">
+                  <div class="col-md-3 mb-3">
                     <label>Student</label>
 					 <input type="text" class="form-control text-secondary"  th:value="${studentStr}" disabled/>
 					
 				 </div>
-                  <div class="col-md-4 mb-3">
+                  <div class="col-md-3 mb-3">
                     <label>Course</label>
 		
 					 <input type="text" class="form-control text-secondary"  th:value="${courseStr}" disabled/>
-                  </div>                                 
-                   <div class="col-md-4 mb-3">
+                  </div>
+                   <div class="col-md-3 mb-3">
+                    <label>Major</label>
+					 <input type="text" class="form-control text-secondary"  th:value="${courseMajorStr}" disabled/>
+                  </div>                          
+                   <div class="col-md-3 mb-3">
                     <label>Current Academic Year</label>				
 					<input type="text" class="form-control text-secondary" th:value="${academicYearStr}" disabled/>
 				 </div>
@@ -59,7 +63,7 @@
  					<p style="color:red" th:if="${#fields.hasErrors('dateOfRegistration')}" th:errors="*{dateOfRegistration}"></p>
                   </div>
                   
-                   <div class="col-md-5 mb-3">
+                   <div class="col-md-6 mb-3">
                     <label for="">Student Year Level</label>
 					<div class="input-group mb-3">
 					  <div class="input-group-prepend" th:style="${edit} ? 'pointer-events: none;opacity: 0.4;' : ''">
@@ -68,8 +72,7 @@
 					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='3rd Year'} ? active : ''" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='3rd Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">3rd Year </a>
 					    <a class="btn btn-outline-secondary" th:classappend="${curriculumYearStr=='4th Year'} ? active : ''" th:href="@{/registrations/{action}(id=(${edit} ? ${studentRegistration.id} : ${studentId}),curriculumYear='4th Year', action=(${edit} ? 'showFormForUpdate' : 'showFormForAdd' ))}">4th Year </a>
 					  </div>
-					</div>
-					
+					</div>			
 					<p style="color:red" th:if="${#fields.hasErrors('curriculumYear')}" th:errors="*{curriculumYear}"></p>
                   </div>
 
@@ -86,15 +89,33 @@
                   </div>
                   <div class="col-md-1 mb-3 ">
                   </div>
-                <div class="col-md-4 mb-3 ">
+                <div class="col-md-5 mb-3 ">
                     <label for="payments">Payment Details</label>
 
 					<table class="table">
 					  <tbody class="text-muted">
-					    <tr th:each="payment : ${payments}">
-					      <th th:text="${payment.paymentDetail}"></th>
-					      <td th:text="${payment.amount}"></td>
+
+						<tr>
+					    	<th>Entrance</th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{entrance}"/></th>
 					    </tr>
+					    <tr>
+					    	<th>No of Units: <span th:text="${totalUnits}"></span></th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{unitsPrice}"/></th>
+					    </tr>
+					    <tr>
+					    	<th>Miscellaneous</th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{miscellaneous}"/></th>
+					    </tr>
+					     <tr>
+					    	<th>Laboratory</th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{laboratory}"/></th>
+					    </tr>
+					    <tr>
+					    	<th>Less</th>
+					    	<th><input type="number" class="form-control form-control-sm" th:field="*{evaluation}"/></th>
+					    </tr>
+		    				    
 					    <tr>
 					    	<th>Less</th>
 					    	<th><input type="number" class="form-control form-control-sm" th:field="*{less}"/></th>

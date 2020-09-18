@@ -8,6 +8,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -46,6 +48,7 @@ public class StudentController{
 
 		int page = 0; 
         int size = 15; 
+        	
         
         if (request.getParameter("page") != null && !request.getParameter("page").isEmpty()) {
             page = Integer.parseInt(request.getParameter("page")) - 1;
@@ -55,12 +58,32 @@ public class StudentController{
             size = Integer.parseInt(request.getParameter("size"));
         }
         
-        String keyword = request.getParameter("keyword");
+        String studentId = request.getParameter("studentId");
+        String lastName = request.getParameter("lastName");
+        String firstName = request.getParameter("firstName");
 
-		theModel.addAttribute("keyword", keyword);
-		theModel.addAttribute("students", studentRepository.findAll(keyword, PageRequest.of(page, size)));
+   
+        Pageable sortedBy;
+ 
+        
+		theModel.addAttribute("studentId", studentId);
 		
-		
+		if(studentId != null && !studentId.isEmpty()) {
+			sortedBy =  PageRequest.of(page, size, Sort.by("studentId"));
+			theModel.addAttribute("students", studentRepository.findByStudentIdStartingWithAndEnable(studentId, true, sortedBy));
+			theModel.addAttribute("studentId", studentId);
+		}else if(lastName != null && !lastName.isEmpty()) {
+			sortedBy =  PageRequest.of(page, size, Sort.by("lastName"));
+			theModel.addAttribute("students", studentRepository.findByLastNameStartingWithAndEnable(lastName, true, sortedBy));
+			theModel.addAttribute("lastName", lastName);
+		}else if(firstName != null && !firstName.isEmpty()) {
+			sortedBy =  PageRequest.of(page, size, Sort.by("firstName"));
+			theModel.addAttribute("students", studentRepository.findByFirstNameStartingWithAndEnable(firstName, true, sortedBy));
+			theModel.addAttribute("firstName", firstName);
+		}else {
+			sortedBy =  PageRequest.of(page, size, Sort.by("lastName"));
+			theModel.addAttribute("students", studentRepository.findByEnable( true, sortedBy));
+		}
 		return "student/students";
 	}
 	
@@ -125,7 +148,7 @@ public class StudentController{
 	}
 	@ModelAttribute("academicYear")
 	public AcademicYear getSchoolYear() {
-		return academicYearRepository.findByCurrent(true);
+		return academicYearRepository.findFirstByCurrent(true);
 
 	}
 

@@ -18,6 +18,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+
 @Entity
 @Table(name="subject")
 public class Subject {
@@ -28,7 +29,7 @@ public class Subject {
 	
 	@NotEmpty(message="is required")
 	@NotNull(message="is required")
-	@Column(name="subjec_title", unique=true)
+	@Column(name="subjec_title")
 	@Size(min=3, message="is required")
 	private String title;
 	

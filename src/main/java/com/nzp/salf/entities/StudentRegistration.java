@@ -77,11 +77,25 @@ public class StudentRegistration {
 	@DateTimeFormat (pattern="yyyy-MM-dd")
 	private LocalDate dateOfRegistration;
 	
+	private Double entrance;
+	
+	@Column(name="units_price")
+	private Double unitsPrice;
+	
+	private Double miscellaneous;
+	
+	private Double laboratory;
+		
+	private Double evaluation;
+	
+	@Transient
+	private Double totalfees;
 	
 	private Double less;
 	
 	private Double balance;
 	
+
 	@Column(name="payment_per_exam")
 	private Double paymentPerExam;
 	
@@ -272,8 +286,6 @@ public class StudentRegistration {
 		this.paymentPerExam = paymentPerExam;
 	}
 
-	
-
 	public Employee getCashier() {
 		return cashier;
 	}
@@ -281,6 +293,66 @@ public class StudentRegistration {
 
 	public void setCashier(Employee cashier) {
 		this.cashier = cashier;
+	}
+
+
+	public Double getEntrance() {
+		return entrance;
+	}
+
+
+	public void setEntrance(Double entrance) {
+		this.entrance = entrance;
+	}
+
+	public Double getUnitsPrice() {
+		return unitsPrice;
+	}
+
+
+	public void setUnitsPrice(Double unitsPrice) {
+		this.unitsPrice = unitsPrice;
+	}
+
+
+	public Double getMiscellaneous() {
+		return miscellaneous;
+	}
+
+
+	public void setMiscellaneous(Double miscellaneous) {
+		this.miscellaneous = miscellaneous;
+	}
+
+
+	public Double getLaboratory() {
+		return laboratory;
+	}
+
+
+	public void setLaboratory(Double laboratory) {
+		this.laboratory = laboratory;
+	}
+
+
+	public Double getEvaluation() {
+		return evaluation;
+	}
+
+
+	public void setEvaluation(Double evaluation) {
+		this.evaluation = evaluation;
+	}
+
+	
+
+	public Double getTotalfees() {
+		return entrance+unitsPrice+miscellaneous+laboratory+evaluation;
+	}
+
+
+	public void setTotalfees(Double totalfees) {
+		this.totalfees = totalfees;
 	}
 
 

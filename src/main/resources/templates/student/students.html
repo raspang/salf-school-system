@@ -24,14 +24,26 @@
 		
 		<form th:action="@{/students/list}" method="GET">
 			<div class="row">
-				<div class="col-md-5">
+				<div class="col-md-2">
 					<input type="text"
-						class="form-control form-control-dark w-100 border"
-						placeholder="Seach first name or last name or ID" name="keyword"
-						id="keyword" size="50" th:value="${keyword}" />
+						class="form-control form-control-sm w-100 border"
+						placeholder="Student ID" name="studentId"
+						id="studentId" size="50" th:value="${studentId}" />
+				</div>
+				<div class="col-md-2">
+					<input type="text"
+						class="form-control form-control-sm w-100 border"
+						placeholder="Last Name" name="lastName"
+						id="lastName" size="50" th:value="${lastName}" />
+				</div>
+				<div class="col-md-2">
+					<input type="text"
+						class="form-control form-control-sm w-100 border"
+						placeholder="First Name" name="firstName"
+						id="firstName" size="50" th:value="${firstName}" />
 				</div>
 				<div class="col-md-4">
-					<button type="submit" class="btn  btn-outline-secondary">Search</button>
+					<button type="submit" class="btn  btn-sm btn-outline-secondary">Search</button>
 
 				</div>
 			</div>
@@ -40,31 +52,32 @@
 		<a th:href="@{/students/showFormForAdd}" class="btn btn-primary m-2">Add</a>
 
 		<div class="table-responsive">
-			<table class="table table-striped table-sm">
+			<table id="studentTable" class="table table-striped table-sm">
 				<thead>
 					<tr>
 						<th>Student ID</th>
-						<th>First Name</th>
-						<th>Middle Name</th>
 						<th>Last Name</th>
+						<th>First Name</th>
+						<th>Middle Name</th>			
 						<th>Gender</th>
-						<th>Date of Birth</th>
-						<th>Address</th>
-						<th>Date Admitted</th>
+						<th>Course</th> 
+						<th>Admit</th>
 						<th></th>
 						<th></th>
 					</tr>
 				</thead>
+	
 				<tbody>
-
 					<tr th:each="temp : ${students}">
 						<td><span th:text="${temp.studentId}">ID</span></td>
+						<td><span th:text="${temp.lastName}">Last Name</span></td>
 						<td><span th:text="${temp.firstName}">First Name</span></td>
 						<td><span th:text="${temp.middleName}">Middle Name</span></td>
-						<td><span th:text="${temp.lastName}">Last Name</span></td>
 						<td><span th:text="${temp.sex}">Gender</span></td>
-						<td><span th:text="${temp.dobStr}">DOB</span></td>
-						<td><span th:text="${temp.address}">Address</span></td>
+						<td>
+							<span th:text="${temp.course.title}">course</span>
+						</td>
+
 						<td><span th:text="${temp.dateOfRegistrationStr}">Date
 								Admitted</span></td>
 						<td>
@@ -91,7 +104,6 @@
 								</th:block>
 							</div>
 						</td>
-
 						<td>
 							<div class="text-center btn-group-sm"
 								style="color: white; display: flex; justify-content: space-evenly;">
@@ -108,6 +120,7 @@
 						</td>
 					</tr>
 				</tbody>
+				
 			</table>
 
 					
@@ -115,7 +128,7 @@
 			    <ul class="pagination justify-content-center font-weight-medium">
 			        <li class="page-item" th:classappend="${students.number eq 0} ? 'disabled'">
 			            <a class="page-link svg-icon"
-			               th:href="@{/students/list?page={id}(id=${students.number lt 2 ? 1 : students.number},keyword=${keyword})}"
+			               th:href="@{/students/list?page={id}(id=${students.number lt 2 ? 1 : students.number},studentId=${studentId},firstName=${firstName},lastName=${lastName})}"
 			               aria-label="Previous"
 			               title="Previous Page" rel="tooltip">
 			                <span aria-hidden="true" data-feather="chevrons-left" width="20" height="20"></span>
@@ -123,7 +136,7 @@
 			        </li>
 			        <li class="page-item" th:classappend="${i eq students.number + 1} ? 'active'"
 			            th:each="i : ${#numbers.sequence( students.number + 1, students.totalPages > 10 + students.number ? students.number + 10 : students.totalPages, 1)}">
-			            <a class="page-link" th:href="@{/students/list?page={id}(id=${i},keyword=${keyword})}" th:text="${i}"
+			            <a class="page-link" th:href="@{/students/list?page={id}(id=${i},studentId=${studentId},firstName=${firstName},lastName=${lastName})}" th:text="${i}"
 			               th:title="${'Page '+ i}"
 			               rel="tooltip"></a>
 			        </li>
@@ -133,7 +146,7 @@
 			            </a>
 			        </li>
 			        <li class="page-item" th:classappend="${students.number + 1 eq students.totalPages} ? 'disabled'">
-			            <a class="page-link svg-icon" th:href="@{/students/list?page={id}(id=${students.number + 2},keyword=${keyword})}"
+			            <a class="page-link svg-icon" th:href="@{/students/list?page={id}(id=${students.number + 2},studentId=${studentId},firstName=${firstName},lastName=${lastName})}"
 			               aria-label="Next"
 			               title="Next Page" rel="tooltip">
 			                <span aria-hidden="true" data-feather="chevrons-right" width="20" height="20"></span>
@@ -141,12 +154,11 @@
 			        </li>
 			    </ul>
 			</nav>
-			
-
 		</div>
 
 
 	</div>
+		
 </body>
 
 </html>

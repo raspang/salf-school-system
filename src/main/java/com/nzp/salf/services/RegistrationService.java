@@ -1,6 +1,5 @@
 package com.nzp.salf.services;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.nzp.salf.entities.AcademicYear;
 import com.nzp.salf.entities.Billing;
-import com.nzp.salf.entities.BillingDetail;
-import com.nzp.salf.entities.Payment;
+import com.nzp.salf.entities.Course;
 import com.nzp.salf.entities.Student;
 import com.nzp.salf.entities.StudentRegistration;
 import com.nzp.salf.repositories.BillingRepository;
@@ -44,37 +42,16 @@ public class RegistrationService {
 		
 	}
 	
-	public List<Payment> getPayments(StudentRegistration theStudentRegistration){
-		return Arrays.asList(
-		getPayment(BillingDetail.ENTRANCE.getDetail(), theStudentRegistration ),
-		getPayment(BillingDetail.UNITS.getDetail(), theStudentRegistration ),
-		getPayment(BillingDetail.MISCELLANEOUS.getDetail(), theStudentRegistration ),
-		getPayment(BillingDetail.LABORATORY.getDetail(), theStudentRegistration ),
-		getPayment(BillingDetail.EVALUATION.getDetail(), theStudentRegistration )
-		);
-	
+	public Double defaultAmountPrice(String paymentDetal, Course course) {
+		
+		Billing billing = billingRepository.findFirstByPaymentDetailAndCourse(paymentDetal, course);
+		if(billing != null) {
+			return billing.getAmount();
+		}
+		billing = billingRepository.findFirstByPaymentDetail(paymentDetal);
+		return billing.getAmount();
+		
 	}
 	
-	private Payment getPayment(String detail,  StudentRegistration theStudentRegistration) {
-		
-		Billing billing = billingRepository.findFirstByPaymentDetailAndCourse(detail, theStudentRegistration.getCourse());	
-		
-		if(billing == null) {
-			billing = billingRepository.findFirstByPaymentDetail(detail);	
-		}
-
-	
-		if(billing == null) {
-			return new Payment(detail, null, theStudentRegistration);
-		}
-		if(detail.equals(BillingDetail.UNITS.getDetail())) {
-			return new Payment(detail, billing.getAmount()*theStudentRegistration.getTotalUnits(), theStudentRegistration);
-		}
-
-		return new Payment(detail, billing.getAmount(), theStudentRegistration);
-		
-		 
-	}
-
 
 }

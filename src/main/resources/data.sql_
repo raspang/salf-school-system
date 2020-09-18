@@ -27,7 +27,7 @@ insert into user_role(user_id, role_id) values
 (2,2)
 ;
 
-insert into course (id, major, title, enable)  VALUES (1,'','BS CRIM', true),(2,'','BS ED', true);
+insert into course (id, major, title, enable)  VALUES (1,'','BACHELOR OF SCIENCE IN CRIMINOLOGY', true),(2,'','BACHELOR OF SECONDARY EDUCATION', true);
 
 insert into employee (id, full_name, position, position_id, selected) VALUES (1,'Jhona Q. Baillespin','Registrar','Registrar', true), (1,'Raida K. Salibo','Cashier','Cashier', true);
 

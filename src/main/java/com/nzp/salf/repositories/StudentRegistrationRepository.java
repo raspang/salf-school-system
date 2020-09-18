@@ -16,16 +16,19 @@ public interface StudentRegistrationRepository extends JpaRepository<StudentRegi
 	
 	@Query("SELECT sr FROM StudentRegistration sr INNER JOIN sr.student st INNER JOIN sr.academicYear ay "
 			+ "WHERE (st.firstName LIKE %?1% OR st.lastName LIKE %?1% OR st.studentId LIKE %?1% ) "
-			+ "AND CONCAT(ay.id, '') LIKE %?2% order by sr.id desc")
+			+ "AND CONCAT(ay.id, '') LIKE %?2% order by  st.lastName, st.firstName, sr.id  desc")
 	Page<StudentRegistration> findAllOrderById(String keyword, String academicYear,  Pageable pageable);
 	
 	@Query("SELECT sr FROM StudentRegistration sr INNER JOIN sr.student st INNER JOIN sr.academicYear ay "
 			+ "WHERE (st.firstName LIKE %?1% OR st.lastName LIKE %?1% OR st.studentId LIKE %?1% ) "
-			+ "AND CONCAT(ay.id, '') LIKE %?2% order by sr.id desc")
+			+ "AND CONCAT(ay.id, '') LIKE %?2% order by st.lastName, st.firstName asc")
 	List<StudentRegistration> findAllOrderById(String keyword, String academicYear);
 	
 	
 	List<StudentRegistration> findByStudentAndAcademicYear(Student student, AcademicYear academicYear);
+	
+	
+	List<StudentRegistration> findByAcademicYearOrderByIdDesc(AcademicYear academicYear);
 	
 	List<StudentRegistration> findByStudentOrderByIdAsc(Student student);
 	

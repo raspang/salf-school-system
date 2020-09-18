@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.nzp.salf.entities.Billing;
 import com.nzp.salf.entities.BillingDetail;
-import com.nzp.salf.entities.Course;
 import com.nzp.salf.repositories.BillingRepository;
 import com.nzp.salf.repositories.CourseRepository;
 

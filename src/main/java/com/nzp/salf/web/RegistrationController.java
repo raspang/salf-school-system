@@ -276,11 +276,7 @@ public class RegistrationController {
         return "redirect:/registrations/list";
     }
 	
-    @GetMapping("/report/pdf/all")
-    public String generateAllReport(HttpServletResponse resp, HttpServletRequest request) throws JRException, IOException {
-        reportService.exportAllReport(resp);
-        return "redirect:/registrations/list";
-    }
+
     
     @GetMapping("/report/pdf/registered-list")
 	public String printReport(HttpServletResponse resp, HttpServletRequest request)  throws JRException, IOException{

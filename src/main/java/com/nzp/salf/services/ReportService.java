@@ -176,9 +176,11 @@ public class ReportService {
 			  parameters.put("courseDesc"+String.valueOf(i), subjects.get(i-1).getDescriptiveTitle()); 
 		  }
 		 
-		  String path = "C:\\Users\\"+System.getProperty("user.name")+"\\Desktop\\Report";
+		 // String path = "C:\\Users\\"+System.getProperty("user.name")+"\\Desktop\\Report";
 		  
-        /*	bytes = JasperRunManager.runReportToPdf(jasperReport, parameters, dataSource);
+		  
+		    byte[] bytes = null;
+       		bytes = JasperRunManager.runReportToPdf(jasperReport, parameters, dataSource);
         	
     		resp.reset();
     		resp.resetBuffer();
@@ -188,11 +190,11 @@ public class ReportService {
     		ouputStream.write(bytes, 0, bytes.length);
     		ouputStream.flush();
     		ouputStream.close();
-    	*/
+
 		  
-	        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+	       // JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
 	  
-	        JasperExportManager.exportReportToPdfFile(jasperPrint, path + "\\COR-"+theStudentRegistration.getStudent().getLastName().toUpperCase()+"-"+theStudentRegistration.getId()+".pdf");
+	        //JasperExportManager.exportReportToPdfFile(jasperPrint, path + "\\COR-"+theStudentRegistration.getStudent().getLastName().toUpperCase()+"-"+theStudentRegistration.getId()+".pdf");
 	 
 		  
 
